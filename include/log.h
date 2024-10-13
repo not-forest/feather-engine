@@ -80,17 +80,17 @@ typedef void (*vLogFn)(tLogEvent *ev);
 enum { lTRACE, lDEBUG, lINFO, lWARN, lERROR, lFATAL };
 
 /* Definitions of useful macros for different logging levels. Those must be used in the actual code. */
-#define feather_log_trace(...) __feather_log(lTRACE, __FILE__, __LINE__, __VA_ARGS__)
-#define feather_log_debug(...) __feather_log(lDEBUG, __FILE__, __LINE__, __VA_ARGS__)
-#define feather_log_info(...)  __feather_log(lINFO,  __FILE__, __LINE__, __VA_ARGS__)
-#define feather_log_warn(...)  __feather_log(lWARN,  __FILE__, __LINE__, __VA_ARGS__)
-#define feather_log_error(...) __feather_log(lERROR, __FILE__, __LINE__, __VA_ARGS__)
-#define feather_log_fatal(...) __feather_log(lFATAL, __FILE__, __LINE__, __VA_ARGS__)
-#define feather_log_set_level(N) __feather_log_set_level(N)
-#define feather_log_quiet(enable) __feather_log_set_quiet(enable)
-#define feather_log_add_callback(fn, udata, level) __feather_log_add_callback(fn, udata, level)
-#define feather_log_add_file(fp, level) __feather_log_add_fp(fp, level)
-#define feather_log_level_string(level) __feather_log_level_string(level)
+#define vFeatherLogTrace(...) __feather_log(lTRACE, __FILE__, __LINE__, __VA_ARGS__)
+#define vFeatherLogDebug(...) __feather_log(lDEBUG, __FILE__, __LINE__, __VA_ARGS__)
+#define vFeatherLogInfo(...)  __feather_log(lINFO,  __FILE__, __LINE__, __VA_ARGS__)
+#define vFeatherLogWarn(...)  __feather_log(lWARN,  __FILE__, __LINE__, __VA_ARGS__)
+#define vFeatherLogError(...) __feather_log(lERROR, __FILE__, __LINE__, __VA_ARGS__)
+#define vFeatherLogFatal(...) __feather_log(lFATAL, __FILE__, __LINE__, __VA_ARGS__)
+#define vFeatherLogSetLevel(N) __feather_log_set_level(N)
+#define vFeatherLogQuiet(enable) __feather_log_set_quiet(enable)
+#define vFeatherLogAddCallback(fn, udata, level) __feather_log_add_callback(fn, udata, level)
+#define vFeatherLogAddFile(fp, level) __feather_log_add_fp(fp, level)
+#define vFeatherLogLevelString(level) __feather_log_level_string(level)
 
 /* 
  *  @brief - based on the provided level id, returns it's string representation. 
