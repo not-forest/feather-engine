@@ -25,6 +25,7 @@
  * */
 
 #include "log.h"
+#include "lock.h"
 
 typedef struct {
     vLogFn vFn;
@@ -75,18 +76,6 @@ static void vFileCallback(tLogEvent *tEv) {
     vfprintf(tEv->vUserData, tEv->cFmt, tEv->vaAp);
     fprintf(tEv->vUserData, "\n");
     fflush(tEv->vUserData);
-} __attribute__((visibility("internal")))
-
-static void vLock(void) {
-    if (tLogger.vLock) {
-        tLogger.vLock(true, tLogger.vUserData);
-    }
-} __attribute__((visibility("internal")))
-
-static void vUnlock(void) {
-    if (tLogger.vLock) {
-        tLogger.vLock(false, tLogger.vUserData);
-    }
 } __attribute__((visibility("internal")))
 
 /* 
@@ -157,7 +146,7 @@ void __feather_log(int iLevel, const char *cFile, int iLine, const char *cFmt, .
         .iLevel = iLevel,
     };
 
-    vLock();
+    vLOCK(tLogger.vLock, tLogger.vUserData);
 
     if (!tLogger.bQuiet && iLevel >= tLogger.iLevel) {
         vInitEvent(&tEv, stderr);
@@ -176,6 +165,6 @@ void __feather_log(int iLevel, const char *cFile, int iLine, const char *cFmt, .
         }
     }
 
-    vUnlock();
+    vUNLOCK(tLogger.vLock, tLogger.vUserData);
 }
 
