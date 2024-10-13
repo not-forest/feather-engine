@@ -10,6 +10,8 @@ class featherTestConan(ConanFile):
     generators = "CMakeDeps", "CMakeToolchain"
 
     def requirements(self):
+        self.requires("tllist/1.1.0")
+        self.requires("sdl/2.30.8")
         self.requires(self.tested_reference_str)
 
     def build(self):
@@ -22,5 +24,7 @@ class featherTestConan(ConanFile):
 
     def test(self):
         if can_run(self):
-            cmd = os.path.join(self.cpp.build.bindir, "minimal")
-            self.run(cmd, env="conanrun")
+            tests = "minimal", "resource"
+            for test in tests:
+                cmd = os.path.join(self.cpp.build.bindir, test)
+                self.run(cmd, env="conanrun")
