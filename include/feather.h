@@ -1,9 +1,8 @@
 /**************************************************************************************************
- *  File: feather.c
+ *  File: feather.h
  *  Desc: Main engine entry bindings. If this header is included, then runtime is fully handled automatically
- *  by this engine. User shall only include his 'init', 'exit' and handlers functions. Loggin API defines six 
- *  verbosity levels, with ability to define callbacks functions for different levels, locking logic on 
- *  multithreading targets.
+ *  by the main function. User shall provide "runtime.h" API, which is re-exported here for simplicity, to feed
+ *  scenes, resources and their inner logic to the engine for proper work.
  **************************************************************************************************
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -31,25 +30,5 @@
 #define FEATHER_H
 
 int iFeatherMain(void) __attribute__((visibility("protected")));
-
-/* 
- *  @brief - provides function for engine initialization.
- *
- *  User function should initialize any user-defined content, before building the first
- *  scene.
- * */
-#define FEATHER_INIT(f)     \
-void __feather_init(void) __attribute__((weak)) { f() } 
-
-/* 
- *  @brief - feather engine initialization function.
- *
- *  Will be called before entering the engine loop. Should be defined by user with
- *  the use of 'FEATHER_INIT' macro.
- * */
-void __feather_init(void);
-
-// Default initialization function if no is provided.
-void __default_init(void);
 
 #endif
