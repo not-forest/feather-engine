@@ -25,6 +25,9 @@
  * */
 
 #include <time.h>
+#include <unistd.h>
+
+#include "log.h"
 #include "runtime.h"
 #include "err.h"
 
@@ -40,15 +43,55 @@
  *  If some fatal error occurs, it will be thrown back as 'tEngineError'.
  * */
 tEngineError errMainLoop(tRuntime *tRun) {
-    time_t tCurrent, tLast;
+    const double MS_PER_FRAME = 1000. / (double)tRun->uFps;
+    time_t tCurrent, tLast, tSleep, tDelay = 0.0;
+    tEngineError errResult;
 
-    time(&tLast);
+    vFeatherLogDebug("Entering the main loop. MS_PER_UPDATE: %f", MS_PER_FRAME);
+
+    tLast = time(NULL);
     for(;;) {
-        time(&tCurrent);
-        time_t tElapsed = tCurrent - tLast;
+        tCurrent = time(NULL);
+        tDelay += tCurrent - tLast;
+        tLast = tCurrent;
         
-        // TODO! Add main loop stages.
+        errResult = errEngineInputHandle(tRun);
+        if (errResult) return errResult;
+
+        // Updating the game for certain amount of time passed.
+        while (tDelay >= UPDATE_AMOUNT) {
+            errResult = errEngineUpdateHandle(tRun);
+            if (errResult) return errResult;
+            tDelay -= UPDATE_AMOUNT;
+        }
+
+        errResult = errEngineRenderHandle(tRun, tDelay);
+        if (errResult) return errResult;
+
+#if FPS_UNLIMITED == false
+        // Sleeping for some amount of time, to not outrun the FPS amount.
+        tSleep = tCurrent + MS_PER_FRAME - time(NULL);
+        if (tSleep > 0) usleep(tSleep);
+#endif
     }
+
+    return 0;
+}
+
+tEngineError errEngineInputHandle(tRuntime *tRun) {
+    vFeatherLogDebug("Entering the input handler function");
+
+    return 0;
+}
+
+tEngineError errEngineUpdateHandle(tRuntime *tRun) {
+    vFeatherLogDebug("Entering the update function");
+
+    return 0;
+}
+
+tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) {
+    vFeatherLogDebug("Entering the rendering function with delay: %f", dDelay);
 
     return 0;
 }
