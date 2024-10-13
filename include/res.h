@@ -33,6 +33,7 @@
 #include <tllist.h>
 
 #include "lock.h"
+#include "intrinsics.h"
 
 /* 
  *  @brief - scene's resource data type.
@@ -69,7 +70,7 @@ typedef tll(tResource) tResList;
     __res_destructor_declare(tType, fPtrC, cCOUNT);     \
 
 // Aliases user defined constructor for runtime use.
-#define __res_constructor_declare(tType, fPtrC, cCOUNT) \ 
+#define __res_constructor_declare(tType, fPtrC, cCOUNT) \  
     tType RES_ ## cCOUNT ## constructor(void)           \
     __attribute__((alias(#fPtrC)));                     \
 
