@@ -4,7 +4,8 @@
  *  loop, scheduling game tasks, handling graphics, physics, timings and can be seen as a core element of
  *  the whole engine structure.
  *
- *  
+ *  User may implement their own main loop and define the runtime manually within their own 'main' function.
+ *  All functions are marked as weak and can be easily redefined with custom implementations.
  **************************************************************************************************
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +27,27 @@
  *
  * */
 
+#pragma once
+
+#ifndef FEATHER_RUNTIME_H
+#define FEATHER_RUNTIME_H
+
 #include <stdint.h>
 #include "err.h"
 
 #include "scene.h"
 #include "intrinsics.h"
+
+#ifndef FPS_UNLIMITED
+// If true, FPS will be unlimited, therefore maximum perfomance is obtained. This will cause more energy
+// to be used ofcource.
+#define FPS_UNLIMITED false
+#endif
+
+#ifndef UPDATE_AMOUNT
+// Amount of update time given for the game. This prevents users with higher FPS to perform more calculations.
+#define UPDATE_AMOUNT 1.0
+#endif
 
 /* 
  *  @brief - engine's runtime datatype structure.
@@ -60,12 +77,44 @@ typedef struct {
 tEngineError errMainLoop(tRuntime *tRun);
 
 /* 
- *  @brief - to not create custom runtime, this function can be used to modify the runtime before entering the
- *  main loop.
+ *  @brief - this function can be used to modify the runtime before entering the main loop.
  *
- *  Note that runtime can also be modified during the main loop.
+ *  Note that runtime can also be modified anywhere during the main loop. In manual implementations, any function
+ *  can be used to configure the runtime.
  * */
-void vRuntimeConfig(tRuntime *tRun);
+void vRuntimeConfig(tRuntime *tRun) __attribute__((weak));
+
+/* 
+ *  @brief - this function can be used to modify the runtime before entering the main loop.
+ *  
+ *  @fConfig - function of type void <name>(tRuntime *tRun) should be supplied. It can modify the runtime as needed.
+ *
+ *  Note that runtime can also be modified anywhere during the main loop. In manual implementations, any function
+ *  can be used to configure the runtime.
+ * */
+#define RUNTIME_CONFIGURE(fConfig) \
+    __ext_StrongAlias(vRuntimeConfig, fConfig);
+
+/* 
+ *  @brief - handles input operations to listen upcoming input from keyboard, mouse, joystick, etc.
+ *
+ *  Does not wait for inputs but listen to them. May work differently on different platform, especially on WASM targets.
+ * */
+tEngineError errEngineInputHandle(tRuntime *tRun) __attribute__((weak));
+
+/* 
+ *  @brief - updates the game state based on obtained inputs, physics, etc.
+ *
+ *  Runs the internal scheduler, which schedules over each provided layer and runs them
+ *  once or infinite times. All input handlers are also executed during this stage to not
+ *  stall the input function too much.
+ * */
+tEngineError errEngineUpdateHandle(tRuntime *tRun) __attribute__((weak));
+
+/* 
+ *  @brief - handles the rendering phase with graphics libraries based on provided physical resources.
+ * */
+tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) __attribute__((weak));
 
 /* 
  *  @brief - default runtime value. Can be used and modified later.
@@ -75,3 +124,5 @@ void vRuntimeConfig(tRuntime *tRun);
         .uFps = 60,                 \
         .sScene = NULL,             \
     };
+
+#endif
