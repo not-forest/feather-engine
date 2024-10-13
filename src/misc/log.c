@@ -24,6 +24,7 @@
  *
  * */
 
+#include <time.h>
 #include "log.h"
 #include "lock.h"
 
