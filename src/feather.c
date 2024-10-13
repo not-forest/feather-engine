@@ -37,26 +37,27 @@
  *  @brief - Overrides the main function of the process if the header file of engine runtime is imported.
  * */
 int iFeatherMain(void) {
-#ifdef NDEBUG
+    tRuntime rRuntime;
+
+#ifndef NDEBUG
     // On release builds, logging verbosity is decreased to info.
-    feather_log_set_level(lINFO);
+    vFeatherLogSetLevel(lINFO);
 #endif
-    feather_log_info("Entering the 'iFeatherMain' function.");
+    vFeatherLogInfo("Entering the 'iFeatherMain' function.");
 
-    tRuntime rRuntime = DEFAULT_RUNTIME();  // Creating the runtime environment.
-
+    rRuntime = DEFAULT_RUNTIME();  // Creating the runtime environment.
 #ifdef vRuntimeConfig
     vRuntimeConfig(&rRuntime);              // This function can be provided by user.
 #else 
-    feather_log_warn("Runtime configuration not provided. Default configuration will be used.");
+    vFeatherLogWarn("Runtime configuration not provided. Default configuration will be used.");
 #endif
 
     // The runtime will loop until the game is exited or error.
-    tEngineError result = errMainLoop(&rRuntime);
-    if (result)
-        feather_log_fatal("Unrecoverable error occured: %s", feather_errfmt(result));
+    tEngineError errResult = errMainLoop(&rRuntime);
+    if (errResult)
+        vFeatherLogFatal("Unrecoverable error occured: %s. Aborting...", feather_errfmt(errResult));
 
-    return result;
+    return errResult;
 }
 
 // Forcing the C compiler to link main function as 'iFeatherMain' during linking when the header is added.
