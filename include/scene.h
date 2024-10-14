@@ -24,6 +24,7 @@
 
 #include "res.h"
 #include "layer.h"
+#include <tllist.h>
 
 #pragma once
 
@@ -36,12 +37,27 @@
  *  @lLayers - list of layers, which are user defined handler function for each scene.
  *  @lResources - list of resources used between layers inside the scene.
  *
- *  Each scene contains a set of resources and handler function to provide the main user program's
- *  logic. The main engine's runtime can handle only one scene at a time.
+ *  Each scene contains a set of handler function to provide the main user program's
+ *  logic. The main engine's runtime can handle only one scene at a time. A scene can have
+ *  zero, one or more cameras.
  * */
 typedef struct {
+    char* sName;
     tLayerList lLayers;
-    tResList lResources;
 } tScene;
+
+/* 
+ *  @brief - pushes one resource to the scene's list.
+ * */
+void vSceneAppendResource(tScene *sScene) __attribute__((nonnull(1)));
+
+/* 
+ *  @brief - defines new empty scene.
+ * */
+#define NEW_SCENE(scName)               \
+    static tScene scName = (tScene) {   \
+        .sName = #scName,               \
+        .lLayers = tll_init(),          \
+    };                                  \
 
 #endif
