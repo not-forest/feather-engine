@@ -33,7 +33,6 @@
 #include <tllist.h>
 
 #include "lock.h"
-#include "intrinsics.h"
 
 /* 
  *  @brief - scene's resource data type.
@@ -64,8 +63,9 @@ typedef tll(tResource) tResList;
  *  @fPtrC - function pointer to the constructor function. It should always return data of proper type.
  *  @fPtrD - function pointer to the destructor function.
  * */
-#define FeatherResource(tType, fPtrC, fPtrD)            \
+#define FEATHER_RESOURCE(tType, fPtrC, fPtrD)            \
     cCOUNT = __COUNTER__;                               \
+    static tType RES_ ## cCOUNT;                        \
     __res_constructor_declare(tType, fPtrC, cCOUNT);    \
     __res_destructor_declare(tType, fPtrC, cCOUNT);     \
 
