@@ -23,12 +23,18 @@
  * */
 
 #include "err.h"
+#include <stdlib.h>
 
+/* 
+ *  @brief - formats feather engine's error into string format.
+ *
+ *  @err - error input. Function ignores error's sign, therefore any format is allowed.
+ * */
 char* feather_errfmt(tEngineError err) {
-    switch (err) {
+    switch (abs(err)) {
         case errNO_SCENE:
             return "No scene was found for loading.";
     }
 
-    return "";
+    return "NON-FEATHER ERROR";
 }

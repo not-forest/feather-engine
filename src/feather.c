@@ -55,7 +55,7 @@ int iFeatherMain(void) {
     // The runtime will loop until the game is exited or error.
     tEngineError errResult = errMainLoop(&rRuntime);
     if (errResult)
-        vFeatherLogFatal("Unrecoverable error occured: %s. Aborting...", feather_errfmt(errResult));
+        vFeatherLogFatal("Unrecoverable error occured: %s Aborting...", feather_errfmt(errResult));
 
     return errResult;
 }
