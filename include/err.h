@@ -32,12 +32,14 @@ typedef int tEngineError;
 
 /* 
  *  @brief - formats feather engine's error into string format.
+ *
+ *  @err - error input. Function ignores error's sign, therefore any format is allowed.
  * */
 char* feather_errfmt(tEngineError err);
 
 #define __ERR_OFFSET 6000
 
 // Scene is not defined, i.e pointer is NULL. 
-#define errNO_SCENE __ERR_OFFSET + 0: tEngineError
+#define errNO_SCENE __ERR_OFFSET + 0
 
 #endif
