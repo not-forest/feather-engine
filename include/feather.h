@@ -29,6 +29,12 @@
 #ifndef FEATHER_H
 #define FEATHER_H
 
+/* Re-exported */
+#include "res.h"    
+#include "runtime.h"
+#include "scene.h"    
+#include "log.h"
+
 int iFeatherMain(void) __attribute__((visibility("protected")));
 
 #endif
