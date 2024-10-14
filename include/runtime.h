@@ -29,6 +29,22 @@
 
 #pragma once
 
+#ifdef __EMSCRIPTEN__
+// SDL2 is not fully compatible with emscripten.
+#include <SDL/SDL.h>
+#if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
+#include <SDL/SDL_opengl.h>
+#endif
+
+#else
+
+#include <SDL2/SDL.h>
+#if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
+#include <SDL2/SDL_opengl.h>
+#endif
+
+#endif
+
 #ifndef FEATHER_RUNTIME_H
 #define FEATHER_RUNTIME_H
 
@@ -60,6 +76,8 @@
  * */
 typedef struct {
     tFPS uFps;
+
+    tResList lResources;
     tScene *sScene;
 } tRuntime;
 
@@ -74,7 +92,7 @@ typedef struct {
  *
  *  If some fatal error occurs, it will be thrown back as 'tEngineError'.
  * */
-tEngineError errMainLoop(tRuntime *tRun);
+tEngineError errMainLoop(tRuntime *tRun) __attribute__((nonnull(1)));
 
 /* 
  *  @brief - this function can be used to modify the runtime before entering the main loop.
@@ -82,25 +100,16 @@ tEngineError errMainLoop(tRuntime *tRun);
  *  Note that runtime can also be modified anywhere during the main loop. In manual implementations, any function
  *  can be used to configure the runtime.
  * */
-void vRuntimeConfig(tRuntime *tRun) __attribute__((weak));
-
-/* 
- *  @brief - this function can be used to modify the runtime before entering the main loop.
- *  
- *  @fConfig - function of type void <name>(tRuntime *tRun) should be supplied. It can modify the runtime as needed.
- *
- *  Note that runtime can also be modified anywhere during the main loop. In manual implementations, any function
- *  can be used to configure the runtime.
- * */
-#define RUNTIME_CONFIGURE(fConfig) \
-    __ext_StrongAlias(vRuntimeConfig, fConfig);
+#define RUNTIME_CONFIGURE(fConfig)      \
+    void vRuntimeConfig(tRuntime *tRun) \
+    __attribute__((nonnull(1), alias(#fConfig)));
 
 /* 
  *  @brief - handles input operations to listen upcoming input from keyboard, mouse, joystick, etc.
  *
  *  Does not wait for inputs but listen to them. May work differently on different platform, especially on WASM targets.
  * */
-tEngineError errEngineInputHandle(tRuntime *tRun) __attribute__((weak));
+tEngineError errEngineInputHandle(tRuntime *tRun) __attribute__((weak, nonnull(1)));
 
 /* 
  *  @brief - updates the game state based on obtained inputs, physics, etc.
@@ -109,12 +118,19 @@ tEngineError errEngineInputHandle(tRuntime *tRun) __attribute__((weak));
  *  once or infinite times. All input handlers are also executed during this stage to not
  *  stall the input function too much.
  * */
-tEngineError errEngineUpdateHandle(tRuntime *tRun) __attribute__((weak));
+tEngineError errEngineUpdateHandle(tRuntime *tRun) __attribute__((weak, nonnull(1)));
 
 /* 
  *  @brief - handles the rendering phase with graphics libraries based on provided physical resources.
  * */
-tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) __attribute__((weak));
+tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) __attribute__((weak, nonnull(1)));
+
+/* 
+ *  @brief - initialization part that executed before entering the main loop.
+ *
+ *  Initializes all content within the chosen scene and starts the loop.
+ * */
+tEngineError errEngineInit(tRuntime *tRun) __attribute__((nonnull(1)));
 
 /* 
  *  @brief - default runtime value. Can be used and modified later.
@@ -122,6 +138,7 @@ tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) __attribute__(
 #define DEFAULT_RUNTIME()           \
     (tRuntime) {                    \
         .uFps = 60,                 \
+        .lResources = tll_init(),   \
         .sScene = NULL,             \
     };
 
