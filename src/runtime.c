@@ -47,6 +47,9 @@ tEngineError errMainLoop(tRuntime *tRun) {
     time_t tCurrent, tLast, tSleep, tDelay = 0.0;
     tEngineError errResult;
 
+    errResult = errEngineInit(tRun);
+    if (errResult) return errResult;
+
     vFeatherLogDebug("Entering the main loop. MS_PER_UPDATE: %f", MS_PER_FRAME);
 
     tLast = time(NULL);
@@ -74,6 +77,18 @@ tEngineError errMainLoop(tRuntime *tRun) {
         if (tSleep > 0) usleep(tSleep);
 #endif
     }
+
+    return 0;
+}
+
+
+tEngineError errEngineInit(tRuntime *tRun) {
+    vFeatherLogDebug("Entering the initialization function.");
+    // Without a single scene, runtime shall abort.
+    if (tRun->sScene == NULL) 
+        return -errNO_SCENE;
+
+    
 
     return 0;
 }
