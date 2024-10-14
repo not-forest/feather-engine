@@ -29,6 +29,10 @@
 #ifndef FEATHER_INTRINSICS_H
 #define FEATHER_INTRINSICS_H
 
+#define __FEATHER_OPENGL__ 0
+#define __FEATHER_VULKAN__ 1
+#define __FEATHER_DIRECTX__ 2
+
 /* One byte value describing amount of frames per second. */
 typedef uint8_t tFPS;
 
