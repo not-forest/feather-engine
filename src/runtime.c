@@ -33,6 +33,7 @@
 #include "runtime.h"
 #include "err.h"
 
+#ifndef __EMSCRIPTEN__
 /* 
  *  @brief - main engine loop. Schedules all layers within the current scene.
  *
@@ -82,18 +83,22 @@ tEngineError errMainLoop(tRuntime *tRun) {
 
     return 0;
 }
+#else
+// TODO!
+#endif
 
-
-tEngineError errEngineInit(tRuntime *tRun) {
-    vFeatherLogDebug("Entering the initialization function.");
-    // Without a single scene, runtime shall abort.
-    if (tRun->sScene == NULL) 
-        return -errNO_SCENE;
-
+tEngineError errEngineInit(tRuntime *tRun) { 
     // SDL environment is initialized here.
     if (SDL_Init( FEATHER_SDL_INIT ) < 0)
         return -errSDL_ERR;
 
+    // Running user configuration here. 
+    if (vRuntimeConfig)
+        vRuntimeConfig(tRun); // This function shall be provided by user.
+    else
+        vFeatherLogWarn("Runtime configuration not provided. Default configuration will be used.");
+
+    // Creating the default window. Can be changed in 'vRuntimeConfig' 
     tRun->wRunWindow = SDL_CreateWindow(
         tRun->cMainWindowName,
         SDL_WINDOWPOS_UNDEFINED,
@@ -102,6 +107,11 @@ tEngineError errEngineInit(tRuntime *tRun) {
         480,
         __FEATHER_SDL_WINDOW_FLAGS
     );
+
+    vFeatherLogDebug("Entering the initialization function.");
+    // Without a single scene, runtime shall abort.
+    if (tRun->sScene == NULL) 
+        return -errNO_SCENE;
 
     return 0;
 }
