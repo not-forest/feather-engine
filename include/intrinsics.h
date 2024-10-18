@@ -33,6 +33,12 @@
 #define __FEATHER_VULKAN__ 1
 #define __FEATHER_DIRECTX__ 2
 
+#define ____BLACK____   0.0f, 0.0f, 0.0f
+#define ____WHITE____   1.0f, 1.0f, 1.0f
+#define ____RED____     1.0f, 0.0f, 0.0f 
+#define ____GREEN____   0.0f, 1.0f, 0.0f
+#define ____BLUE____    0.0f, 0.0f, 1.0f
+
 /* One byte value describing amount of frames per second. */
 typedef uint8_t tFPS;
 
