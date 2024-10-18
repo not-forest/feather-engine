@@ -28,7 +28,7 @@
 #include <stdint.h>
 
 // Creating a new scene.
-NEW_SCENE(Scene1);
+FEATHER_SCENE(Scene1);
 
 // Here we append the scene to runtime, so we wont obtain an error.
 void cfg(tRuntime *tRun) {
@@ -50,6 +50,17 @@ tCharacter constructor(void) {
 
 /* If resource does some dynamic allocations, additional destructor can be implemented. (optional) */ 
 //void destructor(tCharacter *data) {};
+
+// Adding the layer.
+FEATHER_LAYER(&Scene1, PlayerStatsHandler, 
+    struct {
+        uint8_t counter;
+    } myLocalStruct,
+    {
+        myLocalStruct.counter++;
+        vFeatherLogInfo("Hello from layer: %d", myLocalStruct.counter);
+    }
+);
 
 // Marking the structure as a resource. Here the destructor is not required, since no allocations are made.
 FEATHER_RESOURCE(tCharacter, constructor, NULL);
