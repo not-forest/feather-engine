@@ -29,9 +29,16 @@
 
 #pragma once
 
+#ifndef FEATHER_RUNTIME_H
+#define FEATHER_RUNTIME_H
+
+#define __FEATHER_SDL_WINDOW_FLAGS SDL_WINDOW_SHOWN
+
 #ifdef __EMSCRIPTEN__
+
 // SDL2 is not fully compatible with emscripten.
 #include <SDL/SDL.h>
+
 #if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
 #include <SDL/SDL_opengl.h>
 #endif
@@ -39,14 +46,13 @@
 #else
 
 #include <SDL2/SDL.h>
+
 #if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
 #include <SDL2/SDL_opengl.h>
 #endif
 
 #endif
 
-#ifndef FEATHER_RUNTIME_H
-#define FEATHER_RUNTIME_H
 
 #include <stdint.h>
 #include "err.h"
@@ -54,28 +60,42 @@
 #include "scene.h"
 #include "intrinsics.h"
 
-#ifndef FPS_UNLIMITED
+#ifndef FEATHER_FPS_UNLIMITED
 // If true, FPS will be unlimited, therefore maximum perfomance is obtained. This will cause more energy
 // to be used ofcource.
-#define FPS_UNLIMITED false
+#define FEATHER_FPS_UNLIMITED false
 #endif
 
-#ifndef UPDATE_AMOUNT
+#ifndef FEATHER_UPDATE_AMOUNT
 // Amount of update time given for the game. This prevents users with higher FPS to perform more calculations.
-#define UPDATE_AMOUNT 1.0
+#define FEATHER_UPDATE_AMOUNT 1.0
+#endif
+
+#define __FEATHER_SDL_DEFAULT SDL_INIT_VIDEO
+
+// Combination of all required SDL subsystems for the program's need. 
+#ifndef FEATHER_SDL_INIT
+#define FEATHER_SDL_INIT __FEATHER_SDL_DEFAULT
+#else
+#define FEATHER_SDL_INIT __FEATHER_SDL_DEFAULT | FEATHER_SDL_INIT
 #endif
 
 /* 
  *  @brief - engine's runtime datatype structure.
  *
- *  @sScene - currently used scene. 
  *  @uFps - amount of frames per second in which all layers within the scene should be scheduled.
+ *  @wRunWindow - inner SDL window pointer.
+ *  @lResources - list of resources used between layers inside the scene.
+ *  @sScene - currently used scene. 
  *
  *  Defines the current active scene, processes the input, schedules all layers within that scene and
  *  renders the graphics.
  * */
 typedef struct {
     tFPS uFps;
+    char *cMainWindowName;
+
+    SDL_Window *wRunWindow;
 
     tResList lResources;
     tScene *sScene;
@@ -103,6 +123,7 @@ tEngineError errMainLoop(tRuntime *tRun) __attribute__((nonnull(1)));
 #define RUNTIME_CONFIGURE(fConfig)      \
     void vRuntimeConfig(tRuntime *tRun) \
     __attribute__((nonnull(1), alias(#fConfig)));
+void vRuntimeConfig(tRuntime *tRun) __attribute__((nonnull(1), weak));
 
 /* 
  *  @brief - handles input operations to listen upcoming input from keyboard, mouse, joystick, etc.
@@ -138,8 +159,10 @@ tEngineError errEngineInit(tRuntime *tRun) __attribute__((nonnull(1)));
 #define DEFAULT_RUNTIME()           \
     (tRuntime) {                    \
         .uFps = 60,                 \
-        .lResources = tll_init(),   \
+        .cMainWindowName = "window",\
+        .wRunWindow = NULL,         \
         .sScene = NULL,             \
+        .lResources = tll_init(),   \
     };
 
 #endif
