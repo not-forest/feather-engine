@@ -33,7 +33,7 @@
 /* 
  *  @brief - each layer is a user defined function that will be scheduled during update phase.
  * */
-typedef void (*fLayer)(void *anyUserData);
+typedef void (*fLayer)(void *tRun);
 
 /* 
  *  @brief - list of layer functions.
