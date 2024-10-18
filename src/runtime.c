@@ -26,6 +26,7 @@
 
 #include <time.h>
 #include <unistd.h>
+#include "tllist.h"
 
 #include "log.h"
 #include "runtime.h"
@@ -100,6 +101,7 @@ tEngineError errEngineInit(tRuntime *tRun) {
     // Without a single scene, runtime shall abort.
     if (tRun->sScene == NULL) 
         return -errNO_SCENE;
+    vFeatherLogInfo("Starting scene: <%s>", tRun->sScene->sName);
 
     // Creating the default window. Can be changed in 'vRuntimeConfig' 
     tRun->wRunWindow = SDL_CreateWindow(
@@ -135,6 +137,11 @@ tEngineError errEngineInputHandle(tRuntime *tRun) {
 
 tEngineError errEngineUpdateHandle(tRuntime *tRun) {
     //vFeatherLogDebug("Entering the update function");
+
+    // Iterating over each layer.
+    tll_foreach(tRun->sScene->lLayers, layer) {
+        layer->item(tRun);
+    } 
 
     return 0;
 }
