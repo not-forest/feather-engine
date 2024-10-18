@@ -46,11 +46,11 @@ int iFeatherMain(void) {
     vFeatherLogInfo("Entering the 'iFeatherMain' function.");
 
     rRuntime = DEFAULT_RUNTIME();  // Creating the runtime environment.
-#ifdef vRuntimeConfig
-    vRuntimeConfig(&rRuntime);              // This function can be provided by user.
-#else 
-    vFeatherLogWarn("Runtime configuration not provided. Default configuration will be used.");
-#endif
+
+    if (vRuntimeConfig)
+        vRuntimeConfig(&rRuntime); // This function shall be provided by user.
+    else
+        vFeatherLogWarn("Runtime configuration not provided. Default configuration will be used.");
 
     // The runtime will loop until the game is exited or error.
     tEngineError errResult = errMainLoop(&rRuntime);
