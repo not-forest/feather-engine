@@ -34,6 +34,7 @@ NEW_SCENE(Scene1);
 void cfg(tRuntime *tRun) {
     vFeatherLogInfo("My custom runtime configuration function!!!!");
     tRun->sScene = &Scene1;
+    tRun->cMainWindowName = "Resource Example";
 }
 
 /* Here we define a new data type, that we wish to use. */
