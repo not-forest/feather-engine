@@ -39,7 +39,7 @@ char* feather_errfmt(tEngineError err);
 
 #define __ERR_OFFSET 6000
 
-// Scene is not defined, i.e pointer is NULL. 
-#define errNO_SCENE __ERR_OFFSET + 0
+#define errNO_SCENE __ERR_OFFSET + 0    // Scene is not defined, i.e pointer is NULL. 
+#define errSDL_ERR  __ERR_OFFSET + 1    // Error obtained from the SDL, sometimes could be fatal.
 
 #endif

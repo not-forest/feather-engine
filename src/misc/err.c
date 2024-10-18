@@ -23,7 +23,15 @@
  * */
 
 #include "err.h"
+#include <stdio.h>
 #include <stdlib.h>
+
+#ifdef __EMSCRIPTEN__
+#include <SDL/SDL_error.h>
+#else
+#include <SDL2/SDL_error.h>
+#endif
+
 
 /* 
  *  @brief - formats feather engine's error into string format.
@@ -31,10 +39,14 @@
  *  @err - error input. Function ignores error's sign, therefore any format is allowed.
  * */
 char* feather_errfmt(tEngineError err) {
+    char* ret = "NON-FEATHER ERROR"; 
+
     switch (abs(err)) {
         case errNO_SCENE:
-            return "No scene was found for loading.";
+            ret = "No scene was found for loading."; break;
+        case errSDL_ERR:
+            asprintf(&ret, "SDL error obtained: %s", SDL_GetError()); break;
     }
 
-    return "NON-FEATHER ERROR";
+    return ret;
 }
