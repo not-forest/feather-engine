@@ -1,0 +1,36 @@
+# Defines Feather Engine's configuration variables.
+
+# Defines global engine configuration flags 
+menu "Engine Overalls"
+    config FEATHER_FPS_UNLIMITED
+        bool "FPS Unlimited"
+        default n
+        help
+            Makes engine completely ignore the FPS limit within the runtime structures.
+            This removes several code blocks within the engine implementation. Unlimited FPS
+            can also be implemented without using this flag, by setting 'uFps' to zero.
+
+    config FEATHER_UPDATE_AMOUNT
+        int "Update Amount"
+        default 1
+        help
+            Least amount of ms, to update the main application. Inside the main loop, engine will
+            update the program after it listens on oncoming inputs. It will update the program as much
+            as it can until the delay between the previous loop iteration and the current one is smaller
+            than this value. Only then it procedes to render the environment onto the screen.
+
+    config FEATHER_SDL_INIT
+        string "SDL Initialization Flags"
+        help
+            Initialization flags for SDL sybsystem, which are required for your program. Feather will intiialize
+            an SDL environment with those flags provided. The flags shall be provided like so:
+                - SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER;
+endmenu
+
+menu "Graphics"
+    config FEATHER_GRAPHIC_MANAGER
+        string "Graphic Management Backend"
+        default "opengl"
+        help
+            Select the graphic management backend to use. Options: opengl, todo...
+endmenu
