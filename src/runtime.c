@@ -24,13 +24,12 @@
  *
  * */
 
-#include <SDL.h>
-#include <SDL_video.h>
 #include <time.h>
 #include <unistd.h>
 
 #include "log.h"
 #include "runtime.h"
+#include "intrinsics.h"
 #include "err.h"
 
 #ifndef __EMSCRIPTEN__
@@ -97,21 +96,33 @@ tEngineError errEngineInit(tRuntime *tRun) {
         vRuntimeConfig(tRun); // This function shall be provided by user.
     else
         vFeatherLogWarn("Runtime configuration not provided. Default configuration will be used.");
+ 
+    // Without a single scene, runtime shall abort.
+    if (tRun->sScene == NULL) 
+        return -errNO_SCENE;
 
     // Creating the default window. Can be changed in 'vRuntimeConfig' 
     tRun->wRunWindow = SDL_CreateWindow(
         tRun->cMainWindowName,
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED, 
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED, 
         640, 
         480,
         __FEATHER_SDL_WINDOW_FLAGS
     );
 
+#if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetSwapInterval(1);                              // Updates synchronized with vertical retrace. 
+
+    SDL_GL_CreateContext(tRun->wRunWindow);
+    glClearColor(____BLACK____, 1.0f);
+    vFeatherLogInfo("Using GL version: %s", glGetString(GL_VERSION));
+#endif
     vFeatherLogDebug("Entering the initialization function.");
-    // Without a single scene, runtime shall abort.
-    if (tRun->sScene == NULL) 
-        return -errNO_SCENE;
 
     return 0;
 }
@@ -130,6 +141,8 @@ tEngineError errEngineUpdateHandle(tRuntime *tRun) {
 
 tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) {
     //vFeatherLogDebug("Entering the rendering function with delay: %f", dDelay);
+    glClear(GL_COLOR_BUFFER_BIT);
 
+    SDL_GL_SwapWindow(tRun->wRunWindow);
     return 0;
 }
