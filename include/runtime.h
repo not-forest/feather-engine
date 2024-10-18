@@ -62,6 +62,7 @@ __PUSH_WINDOW_FLAGS
 #include <stdint.h>
 #include "err.h"
 
+#include "res.h"
 #include "scene.h"
 #include "intrinsics.h"
 
