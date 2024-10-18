@@ -22,15 +22,14 @@
  *
  * */
 
-#include "res.h"
-#include "layer.h"
-#include <tllist.h>
 
 #pragma once
 
 #ifndef FEATHER_SCENE_H
 #define FEATHER_SCENE_H
 
+#include "layer.h"
+#include <tllist.h>
 /* 
  *  @brief - defines a structure of one generic scene.
  *
@@ -46,14 +45,31 @@ typedef struct {
 } tScene;
 
 /* 
- *  @brief - pushes one resource to the scene's list.
+ *  @brief - pushes layer to the scene's list.
+ *
+ *  Each layer is a user defined function that will be scheduled during the update phase.
+ *  All layers can access the shared resources and it's local variables.
  * */
-void vSceneAppendResource(tScene *sScene) __attribute__((nonnull(1)));
+void vSceneAppendLayer(tScene *sScene, fLayer vLayer) __attribute__((nonnull(1)));
+
+/* 
+ *  @brief - defines and appends a new layer to the scene.
+ *
+ *  Allow to define a layer and append it to the existing scene. User may define any local data
+ *  structure to use within this layer.
+ * */
+#define FEATHER_LAYER(sScene, scName, anyLocal, ...)    \
+    anyLocal;                                           \
+    void scName(void *tRun) __VA_ARGS__;                \
+    __attribute__((constructor))                        \
+    void scName ## _constructor() {                     \
+        vSceneAppendLayer(sScene, scName);              \ 
+    }
 
 /* 
  *  @brief - defines new empty scene.
  * */
-#define NEW_SCENE(scName)               \
+#define FEATHER_SCENE(scName)           \
     static tScene scName = (tScene) {   \
         .sName = #scName,               \
         .lLayers = tll_init(),          \
