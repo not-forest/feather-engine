@@ -35,7 +35,6 @@
  *  @brief - defines a structure of one generic scene.
  *
  *  @lLayers - list of layers, which are user defined handler function for each scene.
- *  @lResources - list of resources used between layers inside the scene.
  *
  *  Each scene contains a set of handler function to provide the main user program's
  *  logic. The main engine's runtime can handle only one scene at a time. A scene can have
