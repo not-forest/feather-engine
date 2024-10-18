@@ -24,6 +24,8 @@
  *
  * */
 
+#include <SDL.h>
+#include <SDL_video.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -62,16 +64,16 @@ tEngineError errMainLoop(tRuntime *tRun) {
         if (errResult) return errResult;
 
         // Updating the game for certain amount of time passed.
-        while (tDelay >= UPDATE_AMOUNT) {
+        while (tDelay >= FEATHER_UPDATE_AMOUNT) {
             errResult = errEngineUpdateHandle(tRun);
             if (errResult) return errResult;
-            tDelay -= UPDATE_AMOUNT;
+            tDelay -= FEATHER_UPDATE_AMOUNT;
         }
 
         errResult = errEngineRenderHandle(tRun, tDelay);
         if (errResult) return errResult;
 
-#if FPS_UNLIMITED == false
+#if FEATHER_FPS_UNLIMITED == false
         // Sleeping for some amount of time, to not outrun the FPS amount.
         tSleep = tCurrent + MS_PER_FRAME - time(NULL);
         if (tSleep > 0) usleep(tSleep);
@@ -88,25 +90,36 @@ tEngineError errEngineInit(tRuntime *tRun) {
     if (tRun->sScene == NULL) 
         return -errNO_SCENE;
 
-    
+    // SDL environment is initialized here.
+    if (SDL_Init( FEATHER_SDL_INIT ) < 0)
+        return -errSDL_ERR;
+
+    tRun->wRunWindow = SDL_CreateWindow(
+        tRun->cMainWindowName,
+        SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED, 
+        640, 
+        480,
+        __FEATHER_SDL_WINDOW_FLAGS
+    );
 
     return 0;
 }
 
 tEngineError errEngineInputHandle(tRuntime *tRun) {
-    vFeatherLogDebug("Entering the input handler function");
+    //vFeatherLogDebug("Entering the input handler function");
 
     return 0;
 }
 
 tEngineError errEngineUpdateHandle(tRuntime *tRun) {
-    vFeatherLogDebug("Entering the update function");
+    //vFeatherLogDebug("Entering the update function");
 
     return 0;
 }
 
 tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) {
-    vFeatherLogDebug("Entering the rendering function with delay: %f", dDelay);
+    //vFeatherLogDebug("Entering the rendering function with delay: %f", dDelay);
 
     return 0;
 }
