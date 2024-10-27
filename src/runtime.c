@@ -46,14 +46,13 @@
  *  If some fatal error occurs, it will be thrown back as 'tEngineError'.
  * */
 tEngineError errMainLoop(tRuntime *tRun) {
-    const double MS_PER_FRAME = 1000. / (double)tRun->uFps;
     time_t tCurrent, tLast, tSleep, tDelay = 0.0;
     tEngineError errResult;
 
     errResult = errEngineInit(tRun);
     if (errResult) return errResult;
 
-    vFeatherLogDebug("Entering the main loop. MS_PER_UPDATE: %f", MS_PER_FRAME);
+    vFeatherLogDebug("Entering the main loop. MS_PER_UPDATE: %f", FEATHER_UPDATE_AMOUNT);
 
     tLast = time(NULL);
     for(;;) {
@@ -76,7 +75,7 @@ tEngineError errMainLoop(tRuntime *tRun) {
 
 #if FEATHER_FPS_UNLIMITED == false
         // Sleeping for some amount of time, to not outrun the FPS amount.
-        tSleep = tCurrent + MS_PER_FRAME - time(NULL);
+        tSleep = tCurrent + FEATHER_UPDATE_AMOUNT - time(NULL);
         if (tSleep > 0) usleep(tSleep);
 #endif
     }
@@ -138,7 +137,7 @@ tEngineError errEngineInputHandle(tRuntime *tRun) {
 tEngineError errEngineUpdateHandle(tRuntime *tRun) {
     //vFeatherLogDebug("Entering the update function");
 
-    // Iterating over each layer.
+    // Iterating over each user defined layer and updating the application logic.
     tll_foreach(tRun->sScene->lLayers, layer) {
         layer->item(tRun);
     } 
@@ -149,6 +148,8 @@ tEngineError errEngineUpdateHandle(tRuntime *tRun) {
 tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) {
     //vFeatherLogDebug("Entering the rendering function with delay: %f", dDelay);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    
 
     SDL_GL_SwapWindow(tRun->wRunWindow);
     return 0;
