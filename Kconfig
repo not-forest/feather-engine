@@ -10,8 +10,8 @@ menu "Engine Overalls"
             This removes several code blocks within the engine implementation. Unlimited FPS
             can also be implemented without using this flag, by setting 'uFps' to zero.
 
-    config FEATHER_UPDATE_AMOUNT
-        int "Update Amount"
+    config UPDATE_LOOP_MIN_TIME
+        int "Update Phase Time"
         default 1
         help
             Least amount of ms, to update the main application. Inside the main loop, engine will
