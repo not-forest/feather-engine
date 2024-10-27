@@ -24,7 +24,7 @@ class featherTestConan(ConanFile):
 
     def test(self):
         if can_run(self):
-            tests = "minimal", "resource"
+            tests = "minimal", "layer_counter"
             for test in tests:
                 cmd = os.path.join(self.cpp.build.bindir, test)
                 self.run(cmd, env="conanrun", ignore_errors=True)
