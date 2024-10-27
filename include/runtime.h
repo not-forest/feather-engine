@@ -72,10 +72,13 @@ __PUSH_WINDOW_FLAGS
 #define FEATHER_FPS_UNLIMITED false
 #endif
 
-#ifndef FEATHER_UPDATE_AMOUNT
-// Amount of update time given for the game. This prevents users with higher FPS to perform more calculations.
-#define FEATHER_UPDATE_AMOUNT 1.0
+#ifndef UPDATE_LOOP_MIN_TIME
+// Amount of update time given for the game. This prevents users with higher FPS to perform more calculations. This
+// constant shall be given in milliseconds.
+#define UPDATE_LOOP_MIN_TIME 1.
 #endif
+
+#define FEATHER_UPDATE_AMOUNT (double)UPDATE_LOOP_MIN_TIME / 1000.
 
 #define __FEATHER_SDL_DEFAULT SDL_INIT_VIDEO
 
