@@ -33,6 +33,8 @@
 #include "intrinsics.h"
 #include "err.h"
 
+#include "shader.h"
+
 #ifndef __EMSCRIPTEN__
 /* 
  *  @brief - main engine loop. Schedules all layers within the current scene.
@@ -122,6 +124,8 @@ tEngineError errEngineInit(tRuntime *tRun) {
     SDL_GL_CreateContext(tRun->wRunWindow);
     glClearColor(____BLACK____, 1.0f);
     vFeatherLogInfo("Using GL version: %s", glGetString(GL_VERSION));
+
+    vgraphInitShaderProgram(tRun);
 #endif
     vFeatherLogDebug("Entering the initialization function.");
 
@@ -149,7 +153,7 @@ tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) {
     //vFeatherLogDebug("Entering the rendering function with delay: %f", dDelay);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    
+
 
     SDL_GL_SwapWindow(tRun->wRunWindow);
     return 0;
