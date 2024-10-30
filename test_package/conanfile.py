@@ -12,6 +12,8 @@ class featherTestConan(ConanFile):
     def requirements(self):
         self.requires("tllist/1.1.0")
         self.requires("sdl/2.30.8")
+        self.requires("cglm/0.9.1")
+
         self.requires(self.tested_reference_str)
 
     def build(self):

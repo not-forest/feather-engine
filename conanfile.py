@@ -24,6 +24,7 @@ class featherRecipe(ConanFile):
     def requirements(self):
         self.requires("tllist/1.1.0")
         self.requires("sdl/2.30.8")
+        self.requires("cglm/0.9.1")
 
     def config_options(self):
         if self.settings.os == "Windows":
