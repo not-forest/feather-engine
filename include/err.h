@@ -39,7 +39,9 @@ char* feather_errfmt(tEngineError err);
 
 #define __ERR_OFFSET 6000
 
-#define errNO_SCENE __ERR_OFFSET + 0    // Scene is not defined, i.e pointer is NULL. 
-#define errSDL_ERR  __ERR_OFFSET + 1    // Error obtained from the SDL, sometimes could be fatal.
+#define errNO_SCENE         __ERR_OFFSET + 0    // Scene is not defined, i.e pointer is NULL. 
+#define errSDL_ERR          __ERR_OFFSET + 1    // Error obtained from the SDL, sometimes could be fatal.
+#define errNO_FILE          __ERR_OFFSET + 2    // Unable to read from/write to file due to it's inexistence.
+#define errBROKEN_SHADER    __ERR_OFFSET + 3    // Unable to compile the shader. This error will come straight from the graphics library.
 
 #endif
