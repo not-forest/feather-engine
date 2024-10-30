@@ -1,5 +1,5 @@
 /**************************************************************************************************
- *  File: intrinsics.h
+ *  File: intrinsics.c
  *  Desc: Engines main intrinsic binding, macros and function for general purpose use. Completely
  *  hidden and shall not be used in the outside code.
  **************************************************************************************************
@@ -23,21 +23,9 @@
  *
  * */
 
-#pragma once
-
-#include <stdint.h>
-#ifndef FEATHER_INTRINSICS_H
-#define FEATHER_INTRINSICS_H
-
-#define __FEATHER_OPENGL__ 0
-#define __FEATHER_VULKAN__ 1
-#define __FEATHER_DIRECTX__ 2
-
-#define ____BLACK____   0.0f, 0.0f, 0.0f
-#define ____WHITE____   1.0f, 1.0f, 1.0f
-#define ____RED____     1.0f, 0.0f, 0.0f 
-#define ____GREEN____   0.0f, 1.0f, 0.0f
-#define ____BLUE____    0.0f, 0.0f, 1.0f
+#include <stdio.h>
+#include <stdlib.h>
+#include "intrinsics.h"
 
 /*
  *  @brief - internal engine's read function.
@@ -49,25 +37,20 @@
  *  @csPath - path to the file location.
  *  @return - returns read data allocated in a buffer on heap.
  * */
-char *__ext_ReadFile(const char *csPath);
+char* __ext_ReadFile(const char *csPath) {
+    FILE* f = fopen(csPath, "r");
 
-/* One byte value describing amount of frames per second. */
-typedef uint8_t tFPS;
-/* Arbitrary game unit. Converted to required unit which is used by graphics library. */
-typedef float tGameUnit;
+    if (!f) 
+        return NULL;
 
-/* Creates a strong alias binding to another function. */
-#define __ext__StrongAlias(TargetFunc, AliasDecl)               \
-    extern __typeof__ (TargetFunc) AliasDecl                    \
-    __attribute__ ((alias (#TargetFunc), copy (TargetFunc)))
+    fseek(f, 0, SEEK_END);
+    long length = ftell(f);
+    fseek(f, 0, SEEK_SET);
 
-/* Creates a weak alias binding to another function. */
-#define __ext__WeakAlias(TargetFunc, AliasDecl) \
-    __ext__StrongAlias(TargetFunc, AliasDecl)   \
-    __attribute__((weak))
+    char* buffer = (char*)malloc(length + 1);
+    fread(buffer, 1, length, f);
+    buffer[length] = '\0';
+    fclose(f);
 
-/* Allows to count the amount of argument provided to the macro up to 10 */
-#define __ext_ArgCounter10(...) __ext_ArgCounter10Helper(__VA_ARGS__, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
-#define __ext_ArgCounter10Helper(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, COUNT, ...) COUNT
-
-#endif
+    return buffer;
+}
