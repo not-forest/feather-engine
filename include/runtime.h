@@ -43,7 +43,7 @@ __PUSH_WINDOW_FLAGS
 #include <SDL/SDL.h>
 
 #if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
-#include <SDL/SDL_opengl.h>
+#include <SDL/SDL_opengles2.h>
 #define __FEATHER_SDL_WINDOW_FLAGS (__POP_WINDOW_FLAGS | SDL_WINDOW_OPENGL)
 #endif
 
@@ -52,7 +52,7 @@ __PUSH_WINDOW_FLAGS
 #include <SDL2/SDL.h>
 
 #if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
-#include <SDL2/SDL_opengl.h>
+#include <SDL2/SDL_opengles2.h>
 #define __FEATHER_SDL_WINDOW_FLAGS (__POP_WINDOW_FLAGS | SDL_WINDOW_OPENGL)
 #endif
 
@@ -97,6 +97,8 @@ __PUSH_WINDOW_FLAGS
  *  @lResources - list of resources used between layers inside the scene.
  *  @sScene - currently used scene. 
  *
+ *  @glShaderProgram* - used when OpenGL is the chosen library for graphics. 
+ *
  *  Defines the current active scene, processes the input, schedules all layers within that scene and
  *  renders the graphics.
  * */
@@ -105,6 +107,10 @@ typedef struct {
     char *cMainWindowName;
 
     SDL_Window *wRunWindow;
+   
+#if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
+    GLuint glShaderProgram;
+#endif
 
     tResList lResources;
     tScene *sScene;
