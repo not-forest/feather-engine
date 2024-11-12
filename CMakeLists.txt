@@ -41,4 +41,5 @@ endif()
 
 message(STATUS "Engine's version: ${PROJECT_VERSION}")
 
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/shaders DESTINATION ${CMAKE_INSTALL_PREFIX}/shaders)
 install(TARGETS feather)
