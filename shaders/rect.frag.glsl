@@ -23,7 +23,7 @@
  *
  * */
 
-#version 330 core
+#version 420 core
 
 out vec4 FragColor;
 
@@ -33,6 +33,6 @@ uniform sampler2D uTexture;
 
 void main() {
     // Mix color and texture (Blend factor can be adjusted if needed)
-    vec4 textureColor = texture(uTexture, TexCoord);
+    vec4 textureColor = texture(uTexture, iTexCoord);
     FragColor = textureColor * vec4(uColor, 1.0);
 }

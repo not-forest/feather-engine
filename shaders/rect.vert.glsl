@@ -23,7 +23,7 @@
  *
  * */
 
-#version 330 core
+#version 420 core
 
 layout(location = 0) in vec2 aPos;      // Normalized vertex position.
 layout(location = 1) in vec2 aSize;     // Rect size.
@@ -31,7 +31,7 @@ layout(location = 2) in vec2 aOffset;   // Offset to position the rectangle.
 layout(location = 3) in vec2 aTexCoord; // Texture coordinates.
 
 uniform mat4 uTransform;                // Transformation matrix
-out vec2 oTexCoord
+out vec2 oTexCoord;
 
 void main() {
     vec2 pos = aPos * aSize + aOffset;
