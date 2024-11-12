@@ -34,7 +34,7 @@
 #error Shader feature cannot be used without the project's root path.
 #endif
 
-#define SHADERS_ROOT_PATH PROJECT_ROOT_PATH"/shader/"
+#define SHADERS_ROOT_PATH PROJECT_ROOT_PATH"/shaders/"
 
 #define FEATHER_CORE_SHADERS    \
                         "rect"  \
@@ -45,13 +45,6 @@
 #include "log.h"
 #include "err.h"
 
-#define __OPENGL_LOG_MSG(glShader, ...)                {\
-    char infoLog[512];                                  \
-    glGetShaderInfoLog(glShader, 512, NULL, infoLog);   \
-    vFeatherLogError(__FILE__, __LINE__, __VA_ARGS__);  \
-    return -errBROKEN_SHADER;}
-
-
 GLuint __compile_shader(const char* sShaderSrc, GLenum tShaderType) {
     int res;
     GLuint glShader = glCreateShader(tShaderType);
@@ -60,8 +53,11 @@ GLuint __compile_shader(const char* sShaderSrc, GLenum tShaderType) {
     glCompileShader(glShader);
 
     glGetShaderiv(glShader, GL_COMPILE_STATUS, &res);
-    if (!res) 
-        __OPENGL_LOG_MSG(glShader, "Unable to compile shader:\n%s", infoLog);
+    if (!res) {
+        char infoLog[512];
+        glGetShaderInfoLog(glShader, 512, NULL, infoLog);
+        vFeatherLogError("Unable to compile shader:\n%s", infoLog);
+    }
 
     return glShader;
 }
@@ -83,10 +79,10 @@ tEngineError errGraphLoadShader(GLuint glShaderProgram, const char *sVertexPath,
 
     vFeatherLogInfo("Loading core shaders:\n%s\n%s\n", sVertexPathFull, sFragmentPathFull);
 
-    char *sVertexSrc = __ext_ReadFile(sVertexPath);
-    char *sFragmentSrc = __ext_ReadFile(sFragmentPath);
+    char *sVertexSrc = __ext_ReadFile(sVertexPathFull);
+    char *sFragmentSrc = __ext_ReadFile(sFragmentPathFull);
 
-    if (!sVertexSrc || !sFragmentSrc) {
+    if (sVertexSrc == NULL || sFragmentSrc == NULL) {
         vFeatherLogFatal("Vertex, fragment source pair cannot be created.");
         return -errNO_FILE;
     }
@@ -113,10 +109,10 @@ void vgraphInitShaderProgram(tRuntime *tRun) {
     for (uint8_t i = 0; i < sizeof(sCore); ++i) {
         strcpy(sFraqBuf, sCore);
         strcpy(sVertBuf, sCore);
-        strcat(sFraqBuf, ".fraq.glsl");
+        strcat(sFraqBuf, ".frag.glsl");
         strcat(sVertBuf, ".vert.glsl");
 
-        errGraphLoadShader(glShaderProgram, sFraqBuf, sVertBuf);
+        errGraphLoadShader(glShaderProgram, sVertBuf, sFraqBuf);
     }     
 
     tRun->glShaderProgram = glShaderProgram;
