@@ -38,19 +38,32 @@
  *  @return - returns read data allocated in a buffer on heap.
  * */
 char* __ext_ReadFile(const char *csPath) {
-    FILE* f = fopen(csPath, "r");
-
-    if (!f) 
+    FILE* f = fopen(csPath, "rb");
+    if (!f) {
         return NULL;
+    }
 
     fseek(f, 0, SEEK_END);
     long length = ftell(f);
+    if (length == -1L) {
+        fclose(f);
+        return NULL;
+    }
     fseek(f, 0, SEEK_SET);
 
     char* buffer = (char*)malloc(length + 1);
-    fread(buffer, 1, length, f);
-    buffer[length] = '\0';
-    fclose(f);
+    if (!buffer) {
+        fclose(f);
+        return NULL;
+    }
 
+    if (fread(buffer, 1, length, f) != length) {
+        free(buffer);
+        fclose(f);
+        return NULL;
+    }
+    buffer[length] = '\0';
+
+    fclose(f);
     return buffer;
 }
