@@ -32,11 +32,18 @@
 #include "context2d.h"
 #include "runtime.h"
 
+/* 
+ *  @brief - Rect data type.
+ *
+ *  Rects are main boxes for holding information about something that shall be drawn on the screen, 
+ *  it's boundaries and coordinates.
+ * */
 typedef struct {
-    float fVertices[20];
-    uint8_t uiIndices[6];
-    char* sTexturePath;
-    tContext2D tCtx;
+    float fVertices[16];       // Vertex data
+    uint8_t uiIndices[6];      // Index data
+    char* sTexturePath;        // Path to texture
+    tContext2D tCtx;           // Transformation context
+    GLuint VAO, VBO, EBO;      // OpenGL objects
 } tRect;
 
 /* 
@@ -44,6 +51,13 @@ typedef struct {
  *
  *  Acts as a constructor for Rect structure. Once created, engine will draw it onto the screen.
  * */
-tRect tInitRect(tRuntime tRun, tContext2D tCtx, char* sTexturePath);
+tRect tInitRect(tContext2D tCtx, char* sTexturePath);
+
+/* 
+ *  @brief - draws the rectangle to the screen.
+ *
+ *  The current position is defined by it's Context2D.
+ * */
+void vDrawRect(tRect *rect, GLuint shaderProgram);
 
 #endif
