@@ -20,7 +20,7 @@ class featherRecipe(ConanFile):
     default_options = {"shared": False, "fPIC": True}
 
     # Sources are located in the same place as this recipe, copy them to the recipe
-    exports_sources = "CMakeLists.txt", "src/*", "include/*"
+    exports_sources = "CMakeLists.txt", "src/*", "include/*", "shaders/*"
     def requirements(self):
         self.requires("tllist/1.1.0")
         self.requires("sdl/2.30.8")
