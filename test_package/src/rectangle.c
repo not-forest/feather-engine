@@ -38,9 +38,9 @@ void cfg(tRuntime *tRun) {
 // This layer just creates a new rectange instance.
 FEATHER_LAYER(&Scene1, RectangeLayer,
     ,{
-        tContext2D ctx = tContextInit();                    // Creating a new 2D contexts.
-        tRuntime* this_runtime = tThisRuntime();            // Obtaining the current runtime.
-        tRect* rect = tInitRect(this_runtime, ctx, NULL);   // Creating new rect.
+        tContext2D ctx = tContextInit();                        // Creating a new 2D contexts.
+        tRuntime* this_runtime = tThisRuntime();                // Obtaining the current runtime.
+        tRect* rect = tInitRect(this_runtime, ctx, 0, NULL);    // Creating new rect.
         rect->tCtx.fX += 1;
     }
 );
