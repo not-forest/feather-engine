@@ -28,9 +28,10 @@
 #ifndef FEATHER_RECT_H
 #define FEATHER_RECT_H
 
+#include <tllist.h>
 #include <stdint.h>
 #include "context2d.h"
-#include "runtime.h"
+#include "intrinsics.h"
 
 /* 
  *  @brief - Rect data type.
@@ -39,25 +40,14 @@
  *  it's boundaries and coordinates.
  * */
 typedef struct {
-    float fVertices[16];       // Vertex data
-    uint8_t uiIndices[6];      // Index data
     char* sTexturePath;        // Path to texture
     tContext2D tCtx;           // Transformation context
-    GLuint VAO, VBO, EBO;      // OpenGL objects
+    GLuint VBO, EBO;           // OpenGL objects
 } tRect;
 
 /* 
- *  @brief - creates a new instance of Rect, while initializing the drawing context.
- *
- *  Acts as a constructor for Rect structure. Once created, engine will draw it onto the screen.
+ *  @brief - List of drawable rectangles.
  * */
-tRect tInitRect(tContext2D tCtx, char* sTexturePath);
-
-/* 
- *  @brief - draws the rectangle to the screen.
- *
- *  The current position is defined by it's Context2D.
- * */
-void vDrawRect(tRect *rect, GLuint shaderProgram);
+typedef tll(tRect) tRectList;
 
 #endif

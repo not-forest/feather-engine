@@ -49,7 +49,7 @@ typedef struct {
     tGameUnit fX, fY;
     float fScaleX, fScaleY;
     float fRotation;
-    mat4* m4UniformMatrix;
+    mat4 m4UniformMatrix;
 } tContext2D;
 
 /* 
@@ -99,53 +99,14 @@ void vApplyMatrix(tContext2D *tCtx, mat4 m4TransformMatrix);
  *  @fScaleX, fScaleY   - scale scalar of the object. Defaults to (1.f, 1.f) if not provided.
  *  @fRotation          - rotation in radians of the object. Defaults to 0.f if not provided.
  * */
-#define tContextInit(...) \
-    __inner_context_init_select(__ext_ArgCounter(__VA_ARGS__) - 1, __VA_ARGS__) 
-
-#define __inner_context_init_select(N, ...) __inner_context_init##N(__VA_ARGS__)
-#define __inner_context_init0(m4Ptr)\
-    (tContext2D) {                  \
-        .fX = 0;                    \
-        .fY = 0;                    \
-        .fScaleX = 1.f;             \
-        .fScaleY = 1.f;             \
-        .fRotation = 0.f;           \
-        .m4UniformMatrix = m4Ptr;   \
-    }
-#define __inner_context_init1(m4Ptr, uX)    \
-    (tContext2D) {                          \
-        fX;                                 \
-        .fY = 0;                            \
-        .fScaleX = 1.f;                     \
-        .fScaleY = 1.f;                     \
-        .fRotation = 0.f;                   \
-        .m4UniformMatrix = m4Ptr;           \
-    }
-#define __inner_context_init2(m4Ptr, uX, uY)    \
-    (tContext2D) {                              \
-        fX; fY;                                 \
-        .fScaleX = 1.f;                         \
-        .fScaleY = 1.f;                         \
-        .fRotation = 0.f;                       \
-        .m4UniformMatrix = m4Ptr;               \
-    }
-#define __inner_context_init3(m4Ptr, uX, uY, fScaleX)   \
-    (tContext2D) {                                      \
-        fX; fY; fScaleX;                                \
-        .fScaleY = 1.f;                                 \
-        .fRotation = 0.f;                               \
-        .m4UniformMatrix = m4Ptr;                       \
-    }
-#define __inner_context_init4(m4Ptr, uX, uY, fScaleX, fScaleY)  \
-    (tContext2D) {                                              \
-        fX; fY; fScaleX; fScaleY;                               \ 
-        .fRotation = 0.f;                                       \
-        .m4UniformMatrix = m4Ptr;                               \
-    }
-#define __inner_context_init5(m4Ptr, uX, uY, fScaleX, fScaleY, fRotation)   \
-    (tContext2D) {                                                          \
-        fX; fY; fScaleX; fScaleY; fRotation;                                \
-        .m4UniformMatrix = m4Ptr;                                           \
+#define tContextInit()                              \
+    (tContext2D) {                                  \
+        .fX = 0,                                    \
+        .fY = 0,                                    \
+        .fScaleX = 1.f,                             \
+        .fScaleY = 1.f,                             \
+        .fRotation = 0.f,                           \
+        .m4UniformMatrix = GLM_MAT4_IDENTITY_INIT   \
     }
 
 #endif

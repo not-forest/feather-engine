@@ -32,70 +32,22 @@
 #ifndef FEATHER_RUNTIME_H
 #define FEATHER_RUNTIME_H
 
-#define __FEATHER_SDL_WINDOW_FLAGS (SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE)
-#define __PUSH_WINDOW_FLAGS _Pragma("push_macro(\"__FEATHER_SDL_WINDOW_FLAGS\")") _Pragma("undef(\"__FEATHER_SDL_WINDOW_FLAGS\")")
-#define __POP_WINDOW_FLAGS _Pragma("pop_macro(\"__FEATHER_SDL_WINDOW_FLAGS\")") __FEATHER_SDL_WINDOW_FLAGS
-__PUSH_WINDOW_FLAGS
-
-#ifdef __EMSCRIPTEN__
-
-// SDL2 is not fully compatible with emscripten.
-#include <SDL/SDL.h>
-
-#if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
-#include <SDL/SDL_opengles2.h>
-#define __FEATHER_SDL_WINDOW_FLAGS (__POP_WINDOW_FLAGS | SDL_WINDOW_OPENGL)
-#endif
-
-#else
-
-#include <SDL2/SDL.h>
-
-#if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
-#include <SDL2/SDL_opengles2.h>
-#define __FEATHER_SDL_WINDOW_FLAGS (__POP_WINDOW_FLAGS | SDL_WINDOW_OPENGL)
-#endif
-
-#endif
-
-
 #include <stdint.h>
 #include "err.h"
 
 #include "res.h"
 #include "scene.h"
 #include "intrinsics.h"
-
-#ifndef FEATHER_FPS_UNLIMITED
-// If true, FPS will be unlimited, therefore maximum perfomance is obtained. This will cause more energy
-// to be used ofcource.
-#define FEATHER_FPS_UNLIMITED false
-#endif
-
-#ifndef UPDATE_LOOP_MIN_TIME
-// Amount of update time given for the game. This prevents users with higher FPS to perform more calculations. This
-// constant shall be given in milliseconds.
-#define UPDATE_LOOP_MIN_TIME 1.
-#endif
-
-#define FEATHER_UPDATE_AMOUNT (double)UPDATE_LOOP_MIN_TIME / 1000.
-
-#define __FEATHER_SDL_DEFAULT SDL_INIT_VIDEO
-
-// Combination of all required SDL subsystems for the program's need. 
-#ifndef FEATHER_SDL_INIT
-#define FEATHER_SDL_INIT __FEATHER_SDL_DEFAULT
-#else
-#define FEATHER_SDL_INIT __FEATHER_SDL_DEFAULT | FEATHER_SDL_INIT
-#endif
+#include "rect.h"
 
 /* 
  *  @brief - engine's runtime datatype structure.
  *
- *  @uFps - amount of frames per second in which all layers within the scene should be scheduled.
+ *  @uFps       - amount of frames per second in which all layers within the scene should be scheduled.
  *  @wRunWindow - inner SDL window pointer.
  *  @lResources - list of resources used between layers inside the scene.
- *  @sScene - currently used scene. 
+ *  @lRects     - list of all rects for drawing.
+ *  @sScene     - currently used scene. 
  *
  *  @glShaderProgram* - used when OpenGL is the chosen library for graphics. 
  *
@@ -113,6 +65,7 @@ typedef struct {
 #endif
 
     tResList lResources;
+    tRectList lRects;
     tScene *sScene;
 } tRuntime;
 
@@ -169,6 +122,21 @@ tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) __attribute__(
 tEngineError errEngineInit(tRuntime *tRun) __attribute__((nonnull(1)));
 
 /* 
+ *  @brief - creates a new instance of Rect, while initializing the drawing context.
+ *
+ *  Acts as a constructor for Rect structure. Rects are owned by the runtime and can only be referenced.
+ *  If some rect shall be shared between the layers, wrap it under a resource structure.
+ * */
+tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, char* sTexturePath) __attribute__((nonnull(1)));
+
+/* 
+ *  @brief - draws the rectangle to the screen.
+ *
+ *  The current position is defined by it's Context2D.
+ * */
+void vDrawRect(tRuntime *tRun, tRect *rect) __attribute__((nonnull(1)));
+
+/* 
  *  @brief - default runtime value. Can be used and modified later.
  * */
 #define DEFAULT_RUNTIME()           \
@@ -178,6 +146,16 @@ tEngineError errEngineInit(tRuntime *tRun) __attribute__((nonnull(1)));
         .wRunWindow = NULL,         \
         .sScene = NULL,             \
         .lResources = tll_init(),   \
+        .lRects = tll_init(),       \
     };
+
+/* 
+ *  @brief - Obtains the current runtime.
+ *
+ *  Runtime is actually always provided to every layer as a pointer, therefore
+ *  it can always be accessed via it's argument name. It is not intuitive though, that's
+ *  why this macro exists
+ * */
+#define tThisRuntime() tRun;
 
 #endif
