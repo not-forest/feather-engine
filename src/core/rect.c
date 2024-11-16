@@ -24,28 +24,18 @@
  * */
 
 #include <stdint.h>
-#include <string.h>
+#include <tllist.h>
 
-#include "rect.h"
 #include "context2d.h"
+#include "runtime.h"
+#include "rect.h"
+#include "intrinsics.h"
 
-/* OPENGL */
-#if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
-
-#ifdef __EMSCRIPTEN__
-#include <SDL/SDL_opengles2.h>
-#else
-#include <SDL2/SDL_opengles2.h>
-#endif
-
-GLuint VAO, VBO, EBO;
-
-const float DVERTICES[] = {
-    // Positions          // Texture Coords
-     0.5f,  0.5f, 0.0f,   1.0f, 1.0f,  // Top Right
-     0.5f, -0.5f, 0.0f,   1.0f, 0.0f,  // Bottom Right
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,  // Bottom Left
-    -0.5f,  0.5f, 0.0f,   0.0f, 1.0f   // Top Left 
+const float RVERTICES[] = {
+     0.5f,  0.5f, 0.0f,  // top right
+     0.5f, -0.5f, 0.0f,  // bottom right
+    -0.5f, -0.5f, 0.0f,  // bottom left
+    -0.5f,  0.5f, 0.0f   // top left 
 };
 
 const uint8_t DINDICES[] = {
@@ -53,38 +43,54 @@ const uint8_t DINDICES[] = {
     1, 2, 3    // Second Triangle
 };
 
-tRect tInitRect(tRuntime tRun, tContext2D tCtx, char* sTexturePath) {
-    tRect rect;
+tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, char* sTexturePath) {
+    // Allocate memory for the new rectangle
+    tRect *rect = (tRect*)malloc(sizeof(tRect));
+    if (!rect) return NULL; // Handle allocation failure
 
-    rect.tCtx = tCtx;
-    rect.sTexturePath = sTexturePath;
-    
-    // Default rectangle representation expects the texture to be applied fully.
-    memcpy(rect.fVertices, DVERTICES, sizeof(DVERTICES));
-    memcpy(rect.uiIndices, DINDICES, sizeof(DINDICES));
+    rect->tCtx = tCtx;
+    rect->sTexturePath = sTexturePath;
 
-    //glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    //glBindVertexArray(VAO);
+    // Generate VBO and EBO (vertex and element buffer objects)
+    glGenBuffers(1, &rect->VBO);
+    glGenBuffers(1, &rect->EBO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(rect.fVertices), rect.fVertices, GL_STATIC_DRAW);
+    // Bind and set VBO data
+    glBindBuffer(GL_ARRAY_BUFFER, rect->VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(RVERTICES), RVERTICES, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(rect.uiIndices), rect.uiIndices, GL_STATIC_DRAW);
+    // Bind and set EBO data
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rect->EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(DINDICES), DINDICES, GL_STATIC_DRAW);
 
-    // Position attribute
+    // Define the vertex attributes
+    // Position attribute (3 floats for position)
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // Texture attribute
+
+    // Texture coordinate attribute (2 floats for texture)
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
-    //glBindVertexArray(0); 
+    // Unbind VBO and VAO for now
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    return rect;
+    // Add the rectangle to the runtime's linked list
+    tll_push_front(tRun->lRects, *rect);
+    return (tRect*)tRun->lRects.head;
 }
 
-#endif
+/* 
+ *  @brief - draws the rectangle to the screen.
+ *
+ *  The current position is defined by it's Context2D.
+ * */
+void vDrawRect(tRuntime *tRun, tRect *rect) {
+    glUseProgram(tRun->glShaderProgram);
+
+    // Pass the transformation matrix to the shader
+    glUniformMatrix4fv(glGetUniformLocation(tRun->glShaderProgram, "uTransform"), 1, GL_FALSE, (float*)*rect->tCtx.m4UniformMatrix);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rect->EBO);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
+}

@@ -153,7 +153,10 @@ tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) {
     //vFeatherLogDebug("Entering the rendering function with delay: %f", dDelay);
     glClear(GL_COLOR_BUFFER_BIT);
 
-
+    // Drawing all rect objects to the screen.
+    tll_foreach(tRun->lRects, rect) {
+        vDrawRect(tRun, (tRect*)rect);
+    }
 
     SDL_GL_SwapWindow(tRun->wRunWindow);
     return 0;
