@@ -25,6 +25,7 @@ menu "Engine Overalls"
             Initialization flags for SDL sybsystem, which are required for your program. Feather will intiialize
             an SDL environment with those flags provided. The flags shall be provided like so:
                 - SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER;
+
 endmenu
 
 menu "Graphics"

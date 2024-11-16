@@ -28,11 +28,11 @@
 out vec4 FragColor;
 
 in vec2 iTexCoord;              // Texture coordinates from vertex shader
-uniform vec3 uColor;            // Color for the rectangle
+uniform vec4 uColor;            // Color for the rectangle
 uniform sampler2D uTexture;
 
 void main() {
     // Mix color and texture (Blend factor can be adjusted if needed)
     vec4 textureColor = texture(uTexture, iTexCoord);
-    FragColor = textureColor * vec4(uColor, 1.0);
+    FragColor = textureColor * uColor;
 }
