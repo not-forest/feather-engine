@@ -127,7 +127,7 @@ tEngineError errEngineInit(tRuntime *tRun) __attribute__((nonnull(1)));
  *  Acts as a constructor for Rect structure. Rects are owned by the runtime and can only be referenced.
  *  If some rect shall be shared between the layers, wrap it under a resource structure.
  * */
-tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, char* sTexturePath) __attribute__((nonnull(1)));
+tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTexturePath) __attribute__((nonnull(1)));
 
 /* 
  *  @brief - draws the rectangle to the screen.

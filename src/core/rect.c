@@ -43,24 +43,23 @@ const uint8_t DINDICES[] = {
     1, 2, 3    // Second Triangle
 };
 
-tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, char* sTexturePath) {
-    // Allocate memory for the new rectangle
-    tRect *rect = (tRect*)malloc(sizeof(tRect));
-    if (!rect) return NULL; // Handle allocation failure
+tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority,  char* sTexturePath) {
+    tRect rect;
 
-    rect->tCtx = tCtx;
-    rect->sTexturePath = sTexturePath;
+    rect.tCtx = tCtx;
+    rect.sTexturePath = sTexturePath;
+    rect.uPriority = uPriority;
 
     // Generate VBO and EBO (vertex and element buffer objects)
-    glGenBuffers(1, &rect->VBO);
-    glGenBuffers(1, &rect->EBO);
+    glGenBuffers(1, &rect.VBO);
+    glGenBuffers(1, &rect.EBO);
 
     // Bind and set VBO data
-    glBindBuffer(GL_ARRAY_BUFFER, rect->VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, rect.VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(RVERTICES), RVERTICES, GL_STATIC_DRAW);
 
     // Bind and set EBO data
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rect->EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rect.EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(DINDICES), DINDICES, GL_STATIC_DRAW);
 
     // Define the vertex attributes
@@ -75,8 +74,16 @@ tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, char* sTexturePath) {
     // Unbind VBO and VAO for now
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // Add the rectangle to the runtime's linked list
-    tll_push_front(tRun->lRects, *rect);
+    // When adding to the whole list, it is being automatically sorted by the priority.
+    tll_foreach(tRun->lRects, it) {
+        if (it->item.uPriority > uPriority) {
+            tll_insert_before(tRun->lRects, it, rect);
+            return (tRect*)it->prev;
+        }
+    }
+        
+    // New higher priority rects are pushed forward.
+    tll_push_front(tRun->lRects, rect);
     return (tRect*)tRun->lRects.head;
 }
 
