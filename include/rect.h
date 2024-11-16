@@ -36,13 +36,18 @@
 /* 
  *  @brief - Rect data type.
  *
+ *  @sTexturePath   - path to the texture for the rectangle. A solid color will be used if the texture is NULL.
+ *  @tCtx           - 2D context of the rectangle. Mutating it is a proper way of changing it's location, size and rotation. 
+ *  @uPriority      - priority for rendering. Higher priorities will be rendered on top of lower ones. 
+ *
  *  Rects are main boxes for holding information about something that shall be drawn on the screen, 
  *  it's boundaries and coordinates.
  * */
 typedef struct {
-    char* sTexturePath;        // Path to texture
-    tContext2D tCtx;           // Transformation context
-    GLuint VBO, EBO;           // OpenGL objects
+    char* sTexturePath;
+    tContext2D tCtx;
+    uint16_t uPriority;   
+    GLuint VBO, EBO;   
 } tRect;
 
 /* 
