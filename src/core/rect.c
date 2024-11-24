@@ -23,6 +23,7 @@
  *
  * */
 
+
 #include <stdint.h>
 #include <tllist.h>
 
@@ -31,11 +32,13 @@
 #include "rect.h"
 #include "intrinsics.h"
 
+// Vertex data (positions + texture coordinates)
 const float RVERTICES[] = {
-     0.5f,  0.5f, 0.0f,  // top right
-     0.5f, -0.5f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f,  // bottom left
-    -0.5f,  0.5f, 0.0f   // top left 
+    // positions        // texture coordinates
+     0.5f,  0.5f, 0.0f,  1.0f, 1.0f,  // top right
+     0.5f, -0.5f, 0.0f,  1.0f, 0.0f,  // bottom right
+    -0.5f, -0.5f, 0.0f,  0.0f, 0.0f,  // bottom left
+    -0.5f,  0.5f, 0.0f,  0.0f, 1.0f   // top left 
 };
 
 const uint8_t DINDICES[] = {
@@ -43,61 +46,77 @@ const uint8_t DINDICES[] = {
     1, 2, 3    // Second Triangle
 };
 
-tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority,  char* sTexturePath) {
-    tRect rect;
+tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTexturePath) {
+    // Allocate memory for the new rectangle
+    tRect *rect = (tRect*)malloc(sizeof(tRect));
+    if (!rect) return NULL; // Handle allocation failure
 
-    rect.tCtx = tCtx;
-    rect.sTexturePath = sTexturePath;
-    rect.uPriority = uPriority;
+    rect->tCtx = tCtx;
+    rect->sTexturePath = sTexturePath;
+    rect->uPriority = uPriority;
 
-    // Generate VBO and EBO (vertex and element buffer objects)
-    glGenBuffers(1, &rect.VBO);
-    glGenBuffers(1, &rect.EBO);
+    // Generate and bind VBO and EBO
+    glGenBuffers(1, &rect->VBO);
+    glGenBuffers(1, &rect->EBO);
 
-    // Bind and set VBO data
-    glBindBuffer(GL_ARRAY_BUFFER, rect.VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, rect->VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(RVERTICES), RVERTICES, GL_STATIC_DRAW);
 
-    // Bind and set EBO data
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rect.EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rect->EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(DINDICES), DINDICES, GL_STATIC_DRAW);
 
     // Define the vertex attributes
     // Position attribute (3 floats for position)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 
     // Texture coordinate attribute (2 floats for texture)
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 
-    // Unbind VBO and VAO for now
+    // Unbind buffers to prevent accidental modification
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    // When adding to the whole list, it is being automatically sorted by the priority.
+    // Insert the rectangle into the list with priority handling
     tll_foreach(tRun->lRects, it) {
         if (it->item.uPriority > uPriority) {
-            tll_insert_before(tRun->lRects, it, rect);
+            tll_insert_before(tRun->lRects, it, *rect);
             return (tRect*)it->prev;
         }
     }
-        
-    // New higher priority rects are pushed forward.
-    tll_push_front(tRun->lRects, rect);
+
+    // New higher priority rectangles are pushed to the front
+    tll_push_front(tRun->lRects, *rect);
     return (tRect*)tRun->lRects.head;
 }
 
 /* 
  *  @brief - draws the rectangle to the screen.
  *
- *  The current position is defined by it's Context2D.
- * */
+ *  The current position is defined by its Context2D.
+ */
 void vDrawRect(tRuntime *tRun, tRect *rect) {
     glUseProgram(tRun->glShaderProgram);
 
     // Pass the transformation matrix to the shader
-    glUniformMatrix4fv(glGetUniformLocation(tRun->glShaderProgram, "uTransform"), 1, GL_FALSE, (float*)*rect->tCtx.m4UniformMatrix);
+    glUniformMatrix4fv(glGetUniformLocation(tRun->glShaderProgram, "uTransform"), 1, GL_FALSE, (const float*)rect->tCtx.m4UniformMatrix);
 
+    // Bind VBO and EBO before drawing
+    glBindBuffer(GL_ARRAY_BUFFER, rect->VBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rect->EBO);
+
+    // Enable vertex attributes and set pointers
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+
+    // Draw the rectangle using the index buffer
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
+
+    // Unbind the buffers after drawing
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }

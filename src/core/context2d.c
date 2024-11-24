@@ -39,7 +39,7 @@
 void vContextTranslate(tContext2D *tCtx, tGameUnit fDx, tGameUnit fDy) {
     tCtx->fX += fDx;
     tCtx->fY += fDy;
-    glm_translate(*tCtx->m4UniformMatrix, (vec3){ tCtx->fX, tCtx->fY, 0.f});
+    glm_translate(tCtx->m4UniformMatrix, (vec3){ tCtx->fX, tCtx->fY, 0.f});
 }
 
 /* 
@@ -52,7 +52,7 @@ void vContextTranslate(tContext2D *tCtx, tGameUnit fDx, tGameUnit fDy) {
 void vContextScale(tContext2D *tCtx, float fDsx, float fDsy) {
     tCtx->fScaleX *= fDsx;
     tCtx->fScaleY *= fDsy;
-    glm_scale(*tCtx->m4UniformMatrix, (vec3){ fDsx, fDsy, 1.0f });
+    glm_scale(tCtx->m4UniformMatrix, (vec3){ fDsx, fDsy, 1.0f });
 }
 
 /* 
@@ -63,7 +63,7 @@ void vContextScale(tContext2D *tCtx, float fDsx, float fDsy) {
  * */
 void vContextRotate(tContext2D *tCtx, float fDr) {
     tCtx->fRotation += fDr;
-    glm_rotate_z(*tCtx->m4UniformMatrix, fDr, *tCtx->m4UniformMatrix);
+    glm_rotate_z(tCtx->m4UniformMatrix, fDr, tCtx->m4UniformMatrix);
 }
 
 /* 
@@ -73,5 +73,5 @@ void vContextRotate(tContext2D *tCtx, float fDr) {
  *  @m4TransformMatrix  - custom tranformation matrix to apply. 
  * */
 void vApplyMatrix(tContext2D *tCtx, mat4 m4TransformMatrix) {
-    glm_mat4_mul(*tCtx->m4UniformMatrix, m4TransformMatrix, *tCtx->m4UniformMatrix);
+    glm_mat4_mul(tCtx->m4UniformMatrix, m4TransformMatrix, tCtx->m4UniformMatrix);
 }
