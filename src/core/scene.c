@@ -32,6 +32,6 @@
  *  Each layer is a user defined function that will be scheduled during the update phase.
  *  All layers can access the shared resources and it's local variables.
  * */
-void vSceneAppendLayer(tScene *sScene, fLayer vLayer) {
+void vSceneAppendLayer(tScene *sScene, tLayer vLayer) {
     tll_push_front(sScene->lLayers, vLayer);
 }
