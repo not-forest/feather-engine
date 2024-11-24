@@ -52,7 +52,7 @@ tCharacter constructor(void) {
 //void destructor(tCharacter *data) {};
 
 // Adding the layer.
-FEATHER_LAYER(&Scene1, PlayerStatsHandler, 
+FEATHER_LAYER(&Scene1, 1, PlayerStatsHandler, 
     struct {
         uint8_t counter;
     } myLocalStruct,

@@ -36,7 +36,7 @@ void cfg(tRuntime *tRun) {
 }
 
 /* Here we define a layer. It will be executed each time the main loop enters the update phase. */
-FEATHER_LAYER(&Scene1, LocalCounterIncrementationLayer, // The name is provided here.  
+FEATHER_LAYER(&Scene1, 1, LocalCounterIncrementationLayer, // The name is provided here.  
     // Local structure declaration. Basically any C code can be defined here.
     struct {
         uint8_t counter;
