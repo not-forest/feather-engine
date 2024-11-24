@@ -1,20 +1,20 @@
-# Main project MakeLists.txt file.
+ # Main project MakeLists.txt file.
 cmake_minimum_required(VERSION 3.15)
 project(feather C)
 
 add_compile_definitions(PROJECT_ROOT_PATH="${CMAKE_SOURCE_DIR}")
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic -g")
+
 # Required external libraries.
 find_package(SDL REQUIRED)
-find_package(cglm REQUIRED)
-find_package(tllist REQUIRED)
 
 # Internal include headers.
 include_directories(feather PUBLIC include)
 file(GLOB_RECURSE SRCS src/*.c)
 add_library(feather ${SRCS})
 
-target_link_libraries(feather PRIVATE SDL::SDL tllist::tllist cglm::cglm)
+target_link_libraries(feather PUBLIC SDL::SDL cglm_headers)
 file(GLOB_RECURSE HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 set_target_properties(feather PROPERTIES PUBLIC_HEADER "${HEADER_FILES}")
 

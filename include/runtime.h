@@ -69,6 +69,7 @@ typedef struct {
     tScene *sScene;
 } tRuntime;
 
+#ifndef __EMSCRIPTEN__
 /* 
  *  @brief - main engine loop. Schedules all layers within the current scene.
  *
@@ -81,6 +82,21 @@ typedef struct {
  *  If some fatal error occurs, it will be thrown back as 'tEngineError'.
  * */
 tEngineError errMainLoop(tRuntime *tRun) __attribute__((nonnull(1)));
+
+#else
+/* 
+ *  @brief - main engine loop. Schedules all layers within the current scene.
+ *
+ *  Main/game loop which handles all operations within the chosen scene. The full workflow can be interpreted
+ *  as so:
+ *  - Processing input (I/O);
+ *  - Main program update (Schedules all layers with internal scheduler/Computes physics);
+ *  - Renders the picture;
+ *
+ *  If some fatal error occurs, it will be thrown back as 'tEngineError'.
+ * */
+tEngineError errMainLoop(void *vData) __attribute__((nonnull(1)));
+#endif
 
 /* 
  *  @brief - this function can be used to modify the runtime before entering the main loop.

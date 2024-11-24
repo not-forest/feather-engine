@@ -1,0 +1,24 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/cc",
+      "-DPROJECT_ROOT_PATH=\"/home/notforest/Documents/feather-engine\"",
+      "-I/home/notforest/Documents/feather-engine/feather",
+      "-I/home/notforest/Documents/feather-engine/PUBLIC",
+      "-I/home/notforest/Documents/feather-engine/include",
+      "-isystem",
+      "/usr/include/SDL",
+      "-Wall",
+      "-Wextra",
+      "-pedantic",
+      "-g",
+      "-c",
+      "-o",
+      "CMakeFiles/feather.dir/src/runtime.c.o",
+      "/home/notforest/Documents/feather-engine/src/runtime.c"
+    ],
+    "directory": "/home/notforest/Documents/feather-engine",
+    "file": "/home/notforest/Documents/feather-engine/src/runtime.c",
+    "output": "/home/notforest/Documents/feather-engine/CMakeFiles/feather.dir/src/runtime.c.o"
+  }
+]

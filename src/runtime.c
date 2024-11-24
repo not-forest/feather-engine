@@ -85,7 +85,64 @@ tEngineError errMainLoop(tRuntime *tRun) {
     return 0;
 }
 #else
-// TODO!
+
+typedef struct {
+    time_t tCurrent, tLast, tSleep, tDelay;
+    tRuntime *tRun;
+} emscripten_helper_struct;
+
+void errMainLoop(void *vData) {
+    emscripten_helper_struct* sHelper = (emscripten_helper_struct*)(vData);
+
+    sHelper->tCurrent = time(NULL);
+    sHelper->tDelay += sHelper->tCurrent - sHelper->tLast;
+    sHelper->tLast = sHelper->tCurrent;
+
+    /* errResult = errEngineInputHandle(sHelper->tRun);
+    if (errResult) return errResult; */
+
+    // Updating the game for certain amount of time passed.
+    while (sHelper->tDelay >= FEATHER_UPDATE_AMOUNT) {
+        /* errResult = errEngineUpdateHandle(tRun);
+        if (errResult) return errResult; */
+        sHelper->tDelay -= FEATHER_UPDATE_AMOUNT;
+    }
+
+    /* errResult = errEngineRenderHandle(tRun, tDelay);
+    if (errResult) return errResult; */
+
+#if FEATHER_FPS_UNLIMITED == false
+    // Sleeping for some amount of time, to not outrun the FPS amount.
+    sHelper->tSleep = sHelper->tCurrent + FEATHER_UPDATE_AMOUNT - time(NULL);
+    if (sHelper->tSleep > 0) usleep(sHelper->tSleep);
+#endif
+}
+
+/* 
+ * Additional helper function for emscripten to enter it's loop.
+ * */
+tEngineError errEmscriptenPreloop(tRuntime *tRun) {
+    time_t tCurrent, tLast, tSleep, tDelay = 0.0;
+    tEngineError errResult;
+
+    errResult = errEngineInit(tRun);
+    if (errResult) return errResult;
+
+    vFeatherLogDebug("Entering the main loop. MS_PER_UPDATE: %f", FEATHER_UPDATE_AMOUNT);
+
+    tLast = time(NULL);
+
+    emscripten_helper_struct mainLoopArg = {
+        .tCurrent = tCurrent,
+        .tDelay = tDelay,
+        .tLast = tLast,
+        .tSleep = tSleep,
+        .tRun = tRun,
+    }
+
+    emscripten_set_main_loop_arg(errMainLoop, mainLoopArg, 0, true);
+}
+
 #endif
 
 tEngineError errEngineInit(tRuntime *tRun) { 
