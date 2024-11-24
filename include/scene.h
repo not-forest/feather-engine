@@ -50,7 +50,8 @@ typedef struct {
  *  Each layer is a user defined function that will be scheduled during the update phase.
  *  All layers can access the shared resources and it's local variables.
  * */
-void vSceneAppendLayer(tScene *sScene, fLayer vLayer) __attribute__((nonnull(1)));
+void vSceneAppendLayer(tScene *sScene, tLayer vLayer) __attribute__((nonnull(1)));
+
 
 /* 
  *  @brief - defines and appends a new layer to the scene.
@@ -58,13 +59,18 @@ void vSceneAppendLayer(tScene *sScene, fLayer vLayer) __attribute__((nonnull(1))
  *  Allow to define a layer and append it to the existing scene. User may define any local data
  *  structure to use within this layer.
  * */
-#define FEATHER_LAYER(sScene, scName, anyLocal, ...)    \
-    anyLocal;                                           \
-    void scName(void *tRun) __VA_ARGS__;                \
-    __attribute__((constructor))                        \
-    void scName ## _constructor() {                     \
-        vSceneAppendLayer(sScene, scName);              \ 
+#define FEATHER_LAYER(sScene, iP, scName, anyLocal, ...)    \
+    anyLocal;                                               \
+    void scName(void *tRun) __VA_ARGS__;                    \
+    __attribute__((constructor))                            \
+    void scName##_constructor() {                           \
+        tLayer layer = {                                    \
+            .fRun = scName,                                 \
+            .iPriority = iP                                 \
+        };                                                  \
+        vSceneAppendLayer(sScene, layer);                   \
     }
+
 
 /* 
  *  @brief - defines new empty scene.
