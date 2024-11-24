@@ -143,7 +143,13 @@ tEngineError errEngineUpdateHandle(tRuntime *tRun) {
 
     // Iterating over each user defined layer and updating the application logic.
     tll_foreach(tRun->sScene->lLayers, layer) {
-        layer->item(tRun);
+        if (layer->item.iPriority) {
+            layer->item.fRun(tRun);
+        }
+
+        if (layer->item.iPriority < 0) {
+            layer->item.iPriority++;
+        }
     } 
 
     return 0;
