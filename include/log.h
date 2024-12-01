@@ -33,7 +33,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 #include <time.h>
-#include "lock.h"
+#include <lock.h>
 
 // Maximum amount of callbacks functions.
 #ifndef FEATHER_LOG_MAX_CALLBACKS

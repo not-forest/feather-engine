@@ -27,8 +27,8 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "intrinsics.h"
-#include "shader.h"
+#include <intrinsics.h>
+#include <shader.h>
 
 #ifndef PROJECT_ROOT_PATH
 #error Shader feature cannot be used without the project's root path.

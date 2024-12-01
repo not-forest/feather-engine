@@ -32,7 +32,7 @@
 #include <threads.h>
 #include <tllist.h>
 
-#include "lock.h"
+#include <lock.h>
 
 /* 
  *  @brief - scene's resource data type.

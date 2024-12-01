@@ -27,10 +27,10 @@
 #include <stdint.h>
 #include <tllist.h>
 
-#include "context2d.h"
-#include "runtime.h"
-#include "rect.h"
-#include "intrinsics.h"
+#include <context2d.h>
+#include <runtime.h>
+#include <rect.h>
+#include <intrinsics.h>
 
 // Vertex data (positions + texture coordinates)
 const float RVERTICES[] = {

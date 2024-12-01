@@ -25,7 +25,7 @@
  * */
 
 #include <stdbool.h>
-#include "lock.h"
+#include <lock.h>
 
 /* 
  *  @brief - calls the external locking algorithm via pointer.

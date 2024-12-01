@@ -26,14 +26,14 @@
 
 #include <time.h>
 #include <unistd.h>
-#include "tllist.h"
+#include <tllist.h>
 
-#include "log.h"
-#include "runtime.h"
-#include "intrinsics.h"
-#include "err.h"
+#include <log.h>
+#include <runtime.h>
+#include <intrinsics.h>
+#include <err.h>
 
-#include "shader.h"
+#include <shader.h>
 
 #ifndef __EMSCRIPTEN__
 /* 
@@ -191,12 +191,38 @@ tEngineError errEngineInit(tRuntime *tRun) {
 
 tEngineError errEngineInputHandle(tRuntime *tRun) {
     //vFeatherLogDebug("Entering the input handler function");
+    SDL_Event sdlEvent;
+
+    while (SDL_PollEvent( &sdlEvent )) {
+        switch (sdlEvent.type) {
+            case SDL_KEYDOWN:
+            case SDL_KEYUP:
+                switch (sdlEvent.key.keysym.sym) {
+
+                }
+
+                break;
+            case SDL_QUIT:
+                vFeatherLogInfo("Exiting...");
+                SDL_Quit();
+                exit(0);
+            default:
+                // Marking all handler function to invoke on update.
+                tll_foreach(tRun->sScene->lControllers, c) 
+                    c->item.invoke = c->item.sdlEventType == sdlEvent.type; 
+
+                break;
+        }
+    }
 
     return 0;
 }
 
 tEngineError errEngineUpdateHandle(tRuntime *tRun) {
     //vFeatherLogDebug("Entering the update function");
+    tll_foreach(tRun->sScene->lControllers, controller)
+        if (controller->item.invoke)
+            controller->item.fHandler(tRun);
 
     // Iterating over each user defined layer and updating the application logic.
     tll_foreach(tRun->sScene->lLayers, layer) {

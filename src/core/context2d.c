@@ -24,8 +24,8 @@
 
 #include <cglm/cglm.h>
 
-#include "intrinsics.h"
-#include "context2d.h"
+#include <intrinsics.h>
+#include <context2d.h>
 
 /* 
  *  @brief - Translates the context to some provided delta values.

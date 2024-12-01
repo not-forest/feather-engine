@@ -28,7 +28,7 @@
 #define FEATHER_CONTEXT2D_H
 
 #include <cglm/cglm.h>
-#include "intrinsics.h"
+#include <intrinsics.h>
 
 /* 
  *  @brief - 2D context, which describes the current location of the object  

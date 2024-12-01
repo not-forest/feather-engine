@@ -1,7 +1,8 @@
 /**************************************************************************************************
- *  File: shader.h
- *  Desc: Internal shader function bindings for the engine. Those functions are used by engine internal
- *  structures, yet may be used directly to manipulate on graphics manually.
+ *  File: controller.h
+ *  Desc: Allows to define some unique features to different scene objects based on the user input.
+ *  By binding the controller to any structure, a set of functions can be defined on each pressed key,
+ *  mouse movement, joystick, etc.
  **************************************************************************************************
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,34 +24,32 @@
  *
  * */
 
-#ifndef FEATHER_SHADER_H
-#define FEATHER_SHADER_H
+#pragma once
 
-#include <err.h>
-#include <runtime.h>
+#ifndef FEATHER_CONTROLLER_H
+#define FEATHER_CONTROLLER_H
 
-/* OPENGL */
-#if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
-
-#ifdef __EMSCRIPTEN__
-#include <SDL/SDL_opengles2.h>
-#else
-#include <SDL2/SDL_opengles2.h>
-#endif
+#include <stdbool.h>
+#include <intrinsics.h>
+#include <tllist.h>
 
 /* 
- *  @brief - initializes the shader program.
- * */
-void vgraphInitShaderProgram(tRuntime *tRun); 
-
-/* 
- *  @brief - Loads the requested shader for future use.
+ *  @brief - controller structure that allows to define handler function for keyboard
+ *  input event.
  *
- *  @sVertexPath, sFragmentPath - path to vertex and fragment glsl shader source files.
- *  Those paths will be automatically concatenated to the shaders folder.
+ *  @fHandler - handler function for the specified event.
+ *  @sdlEvent - specified event on which the handler function shall be invoked.
  * */
-tEngineError errGraphLoadShader(GLuint glShaderProgram, const char *sVertexPath, const char *sFragmentPath);
+typedef struct {
+    void (*fHandler)(void *tRun);
+    SDL_EventType sdlEventType;
+    bool invoke;
+} tController;
 
-#endif
+
+/* 
+ *  @brief - list of controllers.
+ * */
+typedef tll(tController) tControllerList;
 
 #endif

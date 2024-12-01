@@ -28,10 +28,10 @@
  *
  * */
 
-#include "feather.h"
-#include "log.h"
-#include "intrinsics.h"
-#include "runtime.h"
+#include <feather.h>
+#include <log.h>
+#include <intrinsics.h>
+#include <runtime.h>
 
 /* 
  *  @brief - Overrides the main function of the process if the header file of engine runtime is imported.
