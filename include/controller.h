@@ -46,10 +46,20 @@ typedef struct {
     bool invoke;
 } tController;
 
-
 /* 
  *  @brief - list of controllers.
  * */
-typedef tll(tController) tControllerList;
+typedef tll(tController*) tControllerList;
+
+/* 
+ *  @brief - create a new controller.
+ * */
+tController tControllerInit(SDL_EventType sdlEventType, void (fHandler)(void*)) {
+    return (tController) {
+        .sdlEventType = sdlEventType,
+        .fHandler = fHandler,
+        .invoke = false,
+    };
+}
 
 #endif
