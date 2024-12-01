@@ -28,7 +28,8 @@
 #ifndef FEATHER_SCENE_H
 #define FEATHER_SCENE_H
 
-#include "layer.h"
+#include <controller.h>
+#include <layer.h>
 #include <tllist.h>
 /* 
  *  @brief - defines a structure of one generic scene.
@@ -42,6 +43,7 @@
 typedef struct {
     char* sName;
     tLayerList lLayers;
+    tControllerList lControllers;
 } tScene;
 
 /* 
@@ -79,6 +81,7 @@ void vSceneAppendLayer(tScene *sScene, tLayer vLayer) __attribute__((nonnull(1))
     static tScene scName = (tScene) {   \
         .sName = #scName,               \
         .lLayers = tll_init(),          \
+        .lControllers = tll_init(),     \
     };                                  \
 
 #endif

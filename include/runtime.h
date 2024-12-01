@@ -33,12 +33,12 @@
 #define FEATHER_RUNTIME_H
 
 #include <stdint.h>
-#include "err.h"
+#include <err.h>
 
-#include "res.h"
-#include "scene.h"
-#include "intrinsics.h"
-#include "rect.h"
+#include <res.h>
+#include <scene.h>
+#include <intrinsics.h>
+#include <rect.h>
 
 /* 
  *  @brief - engine's runtime datatype structure.
