@@ -35,3 +35,25 @@
 void vSceneAppendLayer(tScene *sScene, tLayer vLayer) {
     tll_push_front(sScene->lLayers, vLayer);
 }
+
+/* 
+ *  @brief - pushes new controller to the scene's list.
+ *
+ *  Each controller is being handled (or not) before all of the layers, but after the input handling phase.
+ *  Controllers are not held by the scene and runtime, so they are preserved within the user defined structure.
+ *  They can always be added and removed at runtime.
+ * */
+void vSceneAppendController(tScene *sScene, tController *tCtrl) {
+    tll_push_front(sScene->lControllers, tCtrl);
+}
+
+/* 
+ *  @brief - removes the controller from the scene's list.
+ *
+ *  Does nothing if the controller is not within the scene's list already.
+ * */
+void vSceneRemoveController(tScene *sScene, tController *tCtrl) {
+    tll_foreach(sScene->lControllers, c)
+        if (c->item == tCtrl)
+            tll_remove(sScene->lControllers, c);
+}
