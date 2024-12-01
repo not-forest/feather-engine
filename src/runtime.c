@@ -193,25 +193,25 @@ tEngineError errEngineInputHandle(tRuntime *tRun) {
     //vFeatherLogDebug("Entering the input handler function");
     SDL_Event sdlEvent;
 
+    tControllerList tCl = tll_init();
+    tll_foreach(tRun->sScene->lControllers, c) 
+        tll_push_front(tCl, c->item);
+
     while (SDL_PollEvent( &sdlEvent )) {
         switch (sdlEvent.type) {
-            case SDL_KEYDOWN:
-            case SDL_KEYUP:
-                switch (sdlEvent.key.keysym.sym) {
-
-                }
-
-                break;
             case SDL_QUIT:
                 vFeatherLogInfo("Exiting...");
+                tll_free(tRun->sScene->lControllers);
+                tll_free(tRun->sScene->lLayers);
+                tll_free(tRun->lResources);
+                tll_free(tRun->lRects);
+
                 SDL_Quit();
                 exit(0);
             default:
                 // Marking all handler function to invoke on update.
-                tll_foreach(tRun->sScene->lControllers, c) 
-                    c->item.invoke = c->item.sdlEventType == sdlEvent.type; 
-
-                break;
+                tll_foreach(tCl, c) 
+                    c->item->invoke = c->item->sdlEventType == sdlEvent.type; 
         }
     }
 
@@ -220,9 +220,11 @@ tEngineError errEngineInputHandle(tRuntime *tRun) {
 
 tEngineError errEngineUpdateHandle(tRuntime *tRun) {
     //vFeatherLogDebug("Entering the update function");
+    
+    // Running all controller handler functions.
     tll_foreach(tRun->sScene->lControllers, controller)
-        if (controller->item.invoke)
-            controller->item.fHandler(tRun);
+        if (controller->item->invoke)
+            controller->item->fHandler(tRun);
 
     // Iterating over each user defined layer and updating the application logic.
     tll_foreach(tRun->sScene->lLayers, layer) {
