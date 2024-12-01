@@ -26,6 +26,11 @@ menu "Engine Overalls"
             an SDL environment with those flags provided. The flags shall be provided like so:
                 - SDL_INIT_AUDIO | SDL_INIT_JOYSTICK | SDL_INIT_GAMECONTROLLER;
 
+    config FEATHER_LOG_MAX_CALLBACKS
+        int "Maximum log callbacks amount"
+        default 0
+        help 
+            Maximum amount of callbacks function for logging.
 endmenu
 
 menu "Graphics"
