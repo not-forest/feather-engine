@@ -104,6 +104,8 @@ char *__ext_ReadFile(const char *csPath);
 typedef uint8_t tFPS;
 /* Arbitrary game unit. Converted to required unit which is used by graphics library. */
 typedef float tGameUnit;
+/* Pointer to any void function with void pointer argument. */
+typedef void (*fClosure)(void*);
 
 /* Creates a strong alias binding to another function. */
 #define __ext__StrongAlias(TargetFunc, AliasDecl)               \
