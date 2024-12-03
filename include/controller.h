@@ -54,12 +54,34 @@ typedef tll(tController*) tControllerList;
 /* 
  *  @brief - create a new controller.
  * */
-tController tControllerInit(SDL_EventType sdlEventType, void (fHandler)(void*)) {
-    return (tController) {
-        .sdlEventType = sdlEventType,
-        .fHandler = fHandler,
-        .invoke = false,
-    };
-}
+tController tControllerInit(SDL_EventType sdlEventType, void (fHandler)(void*));
+
+typedef struct {
+    SDL_Keysym sdlKey;
+    fClosure fHandler;
+} tKeyboardHandlerPair;
+
+/* 
+ *  @brief - convenient controller for handling keyboard input.
+ * */
+typedef struct {
+    tController tKeyboardCtrl;
+    tll(tKeyboardHandlerPair) lOnPress;
+    tll(tKeyboardHandlerPair) lOnRelease;
+    tll(tKeyboardHandlerPair) lOnClick;
+} tKeyboardController;
+
+/* 
+ *  @brief - append handler function for the keyboard controller on press event.  
+ * */
+void vKeyboardOnPress(tKeyboardController* tKeyboardCtrl, SDL_Keysym sdlKey, void (*fHanler)(void *uData));
+/* 
+ *  @brief - append handler function for the keyboard controller on release event.  
+ * */
+void vKeyboardOnRelease(tKeyboardController* tKeyboardCtrl, SDL_Keysym sdlKey, void (*fHanler)(void *uData));
+/* 
+ *  @brief - append handler function for the keyboard controller on click event.  
+ * */
+void vKeyboardOnClick(tKeyboardController* tKeyboardCtrl, SDL_Keysym sdlKey, void (*fHanler)(void *uData));
 
 #endif
