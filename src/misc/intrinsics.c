@@ -57,7 +57,7 @@ char* __ext_ReadFile(const char *csPath) {
         return NULL;
     }
 
-    if (fread(buffer, 1, length, f) != length) {
+    if ((long)fread(buffer, 1, length, f) != length) {
         free(buffer);
         fclose(f);
         return NULL;
