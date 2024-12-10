@@ -31,6 +31,8 @@
 #include <controller.h>
 #include <layer.h>
 #include <tllist.h>
+#include <rect.h>
+
 /* 
  *  @brief - defines a structure of one generic scene.
  *
@@ -44,6 +46,7 @@ typedef struct {
     char* sName;
     tLayerList lLayers;
     tControllerList lControllers;
+    tRectList lRects;
 } tScene;
 
 /* 
@@ -97,6 +100,7 @@ void vSceneRemoveController(tScene *sScene, uint32_t uControllerID) __attribute_
         .sName = #scName,               \
         .lLayers = tll_init(),          \
         .lControllers = tll_init(),     \
+        .lRects = tll_init(),           \
     };                                  \
 
 #endif

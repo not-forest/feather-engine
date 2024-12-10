@@ -79,16 +79,16 @@ tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTex
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     // Insert the rectangle into the list with priority handling
-    tll_foreach(tRun->lRects, it) {
+    tll_foreach(tRun->sScene->lRects, it) {
         if (it->item.uPriority > uPriority) {
-            tll_insert_before(tRun->lRects, it, *rect);
+            tll_insert_before(tRun->sScene->lRects, it, *rect);
             return (tRect*)it->prev;
         }
     }
 
     // New higher priority rectangles are pushed to the front
-    tll_push_front(tRun->lRects, *rect);
-    return (tRect*)tRun->lRects.head;
+    tll_push_front(tRun->sScene->lRects, *rect);
+    return (tRect*)tRun->sScene->lRects.head;
 }
 
 /* 

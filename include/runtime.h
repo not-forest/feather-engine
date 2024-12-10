@@ -65,7 +65,6 @@ typedef struct {
 #endif
 
     tResList lResources;
-    tRectList lRects;
     tScene *sScene;
 } tRuntime;
 
@@ -183,7 +182,6 @@ void vRuntimeSetWindowTitle(tRuntime *tRun, char* sTitle);
         .wRunWindow = NULL,         \
         .sScene = NULL,             \
         .lResources = tll_init(),   \
-        .lRects = tll_init(),       \
     };
 
 /* 

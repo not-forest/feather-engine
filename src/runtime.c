@@ -210,8 +210,8 @@ tEngineError errEngineInputHandle(tRuntime *tRun) {
                 vFeatherLogInfo("Exiting...");
                 tll_free(tRun->sScene->lControllers);
                 tll_free(tRun->sScene->lLayers);
+                tll_free(tRun->sScene->lRects);
                 tll_free(tRun->lResources);
-                tll_free(tRun->lRects);
 
                 SDL_Quit();
                 exit(0);
@@ -257,7 +257,7 @@ tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Drawing all rect objects to the screen.
-    tll_foreach(tRun->lRects, rect) {
+    tll_foreach(tRun->sScene->lRects, rect) {
         vDrawRect(tRun, (tRect*)rect);
     }
 
