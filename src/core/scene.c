@@ -43,7 +43,7 @@ void vSceneAppendLayer(tScene *sScene, tLayer vLayer) {
  *  Controllers are not held by the scene and runtime, so they are preserved within the user defined structure.
  *  They can always be added and removed at runtime.
  * */
-void vSceneAppendController(tScene *sScene, tController *tCtrl) {
+void vSceneAppendController(tScene *sScene, tController tCtrl) {
     tll_push_front(sScene->lControllers, tCtrl);
 }
 
@@ -52,8 +52,8 @@ void vSceneAppendController(tScene *sScene, tController *tCtrl) {
  *
  *  Does nothing if the controller is not within the scene's list already.
  * */
-void vSceneRemoveController(tScene *sScene, tController *tCtrl) {
+void vSceneRemoveController(tScene *sScene, uint32_t uControllerID) {
     tll_foreach(sScene->lControllers, c)
-        if (c->item == tCtrl)
+        if (c->item.uControllerID == uControllerID)
             tll_remove(sScene->lControllers, c);
 }
