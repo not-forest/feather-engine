@@ -189,13 +189,20 @@ tEngineError errEngineInit(tRuntime *tRun) {
     return 0;
 }
 
+/* 
+ *  @brief - swaps the current scene to another one.
+ *
+ *  The previous scene will be saved in the same state it was left. After this command the layers
+ *  from the new scene are going to be scheduled. Initialization layers are not returned to the initial
+ *  state after the swap, so they must be reset manually before calling this function.
+ * */
+void vRuntimeSwapScene(tRuntime *tRun, tScene *tSc) {
+    tRun->sScene = tSc;
+}
+
 tEngineError errEngineInputHandle(tRuntime *tRun) {
     //vFeatherLogDebug("Entering the input handler function");
     SDL_Event sdlEvent;
-
-    tControllerList tCl = tll_init();
-    tll_foreach(tRun->sScene->lControllers, c) 
-        tll_push_front(tCl, c->item);
 
     while (SDL_PollEvent( &sdlEvent )) {
         switch (sdlEvent.type) {
@@ -210,8 +217,12 @@ tEngineError errEngineInputHandle(tRuntime *tRun) {
                 exit(0);
             default:
                 // Marking all handler function to invoke on update.
-                tll_foreach(tCl, c) 
-                    c->item->invoke = c->item->sdlEventType == sdlEvent.type; 
+                tll_foreach(tRun->sScene->lControllers, c) {
+                    if (!c->item.invoke) {
+                        vFeatherLogInfo("%d, %d", c->item.sdlEventType, sdlEvent.type);
+                        c->item.invoke = c->item.sdlEventType == sdlEvent.type;
+                    }
+                }
         }
     }
 
@@ -222,19 +233,20 @@ tEngineError errEngineUpdateHandle(tRuntime *tRun) {
     //vFeatherLogDebug("Entering the update function");
     
     // Running all controller handler functions.
-    tll_foreach(tRun->sScene->lControllers, controller)
-        if (controller->item->invoke)
-            controller->item->fHandler(tRun);
+    tll_foreach(tRun->sScene->lControllers, c) {
+        if (c->item.invoke) {
+            c->item.fHandler(tRun);
+            c->item.invoke = false;
+        }
+    }
 
     // Iterating over each user defined layer and updating the application logic.
-    tll_foreach(tRun->sScene->lLayers, layer) {
-        if (layer->item.iPriority) {
-            layer->item.fRun(tRun);
-        }
+    tll_foreach(tRun->sScene->lLayers, l) {
+        if (l->item.iPriority)
+            l->item.fRun(tRun);
 
-        if (layer->item.iPriority < 0) {
-            layer->item.iPriority++;
-        }
+        if (l->item.iPriority < 0)
+            l->item.iPriority++;
     } 
 
     return 0;
@@ -251,4 +263,11 @@ tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) {
 
     SDL_GL_SwapWindow(tRun->wRunWindow);
     return 0;
+}
+
+/* 
+ *  @brief - changes the screen's title. Can be used any time during the runtime.
+ * */
+void vRuntimeSetWindowTitle(tRuntime *tRun, char* sTitle) {
+    SDL_SetWindowTitle(tRun->wRunWindow, sTitle);
 }
