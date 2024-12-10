@@ -61,14 +61,14 @@ void vSceneAppendLayer(tScene *sScene, tLayer vLayer) __attribute__((nonnull(1))
  *  Controllers are not held by the scene and runtime, so they are preserved within the user defined structure.
  *  They can always be added and removed at runtime.
  * */
-void vSceneAppendController(tScene *sScene, tController *tCtrl) __attribute__((nonnull(2)));
+void vSceneAppendController(tScene *sScene, tController tCtrl) __attribute__((nonnull(1)));
 
 /* 
  *  @brief - removes the controller from the scene's list.
  *
  *  Does nothing if the controller is not within the scene's list already.
  * */
-void vSceneRemoveController(tScene *sScene, tController *tCtrl) __attribute__((nonnull(2)));
+void vSceneRemoveController(tScene *sScene, uint32_t uControllerID) __attribute__((nonnull(1)));
 
 /* 
  *  @brief - defines and appends a new layer to the scene.
