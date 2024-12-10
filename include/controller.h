@@ -37,24 +37,22 @@
  *  @brief - controller structure that allows to define handler function for keyboard
  *  input event.
  *
- *  @fHandler - handler function for the specified event.
- *  @sdlEvent - specified event on which the handler function shall be invoked.
+ *  @fHandler       - handler function for the specified event.
+ *  @sdlEvent       - specified event on which the handler function shall be invoked.
+ *  @uControllerID  - identifier of this controller.
+ *  @invoke         - inner flag used to identify invoked controllers.
  * */
 typedef struct {
     void (*fHandler)(void *tRun);
     SDL_EventType sdlEventType;
+    uint32_t uControllerID;
     bool invoke;
 } tController;
 
 /* 
  *  @brief - list of controllers.
  * */
-typedef tll(tController*) tControllerList;
-
-/* 
- *  @brief - create a new controller.
- * */
-tController tControllerInit(SDL_EventType sdlEventType, void (fHandler)(void*));
+typedef tll(tController) tControllerList;
 
 typedef struct {
     SDL_Keysym sdlKey;
