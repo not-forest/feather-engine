@@ -24,15 +24,23 @@
  *
  * */
 
+#include <stdint.h>
 #include <tllist.h>
 #include <controller.h>
+#include <runtime.h>
+#include <scene.h>
 
-tController tControllerInit(SDL_EventType sdlEventType, void (fHandler)(void*)) {
-    return (tController) {
+static uint32_t CONT_COUNTER = 0;
+uint32_t tControllerInit(tRuntime *tRun, SDL_EventType sdlEventType, void (fHandler)(void*)) {
+    uint32_t uCCounter = ++CONT_COUNTER;
+    tController tC = {
         .sdlEventType = sdlEventType,
         .fHandler = fHandler,
+        .uControllerID = uCCounter,
         .invoke = false,
     };
+    vSceneAppendController(tRun->sScene, tC);
+    return uCCounter;
 }
 
 /* 
