@@ -146,11 +146,32 @@ tEngineError errEngineInit(tRuntime *tRun) __attribute__((nonnull(1)));
 tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTexturePath) __attribute__((nonnull(1)));
 
 /* 
+ *  @brief - create a new controller.
+ *
+ *  @return - returns an id of the new controller.
+ * */
+uint32_t tControllerInit(tRuntime *tRun, SDL_EventType sdlEventType, void (fHandler)(void*));
+
+/* 
  *  @brief - draws the rectangle to the screen.
  *
  *  The current position is defined by it's Context2D.
  * */
 void vDrawRect(tRuntime *tRun, tRect *rect) __attribute__((nonnull(1)));
+
+/* 
+ *  @brief - swaps the current scene to another one.
+ *
+ *  The previous scene will be saved in the same state it was left. After this command the layers
+ *  from the new scene are going to be scheduled. Initialization layers are not returned to the initial
+ *  state after the swap, so they must be reset manually before calling this function.
+ * */
+void vRuntimeSwapScene(tRuntime *tRun, tScene *tSc);
+
+/* 
+ *  @brief - changes the screen's title. Can be used any time during the runtime.
+ * */
+void vRuntimeSetWindowTitle(tRuntime *tRun, char* sTitle);
 
 /* 
  *  @brief - default runtime value. Can be used and modified later.
