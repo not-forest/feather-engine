@@ -81,7 +81,7 @@ void vSceneRemoveController(tScene *sScene, uint32_t uControllerID) __attribute_
  * */
 #define FEATHER_LAYER(sScene, iP, scName, anyLocal, ...)    \
     anyLocal;                                               \
-    void scName(void *tRun) __VA_ARGS__;                    \
+    void scName(void *__tRun) __VA_ARGS__;                  \
     __attribute__((constructor))                            \
     void scName##_constructor() {                           \
         tLayer layer = {                                    \
