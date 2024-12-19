@@ -43,13 +43,12 @@
 /* 
  *  @brief - engine's runtime datatype structure.
  *
- *  @uFps       - amount of frames per second in which all layers within the scene should be scheduled.
- *  @wRunWindow - inner SDL window pointer.
- *  @lResources - list of resources used between layers inside the scene.
- *  @lRects     - list of all rects for drawing.
- *  @sScene     - currently used scene. 
- *
- *  @glShaderProgram* - used when OpenGL is the chosen library for graphics. 
+ *  @uFps           - amount of frames per second in which all layers within the scene should be scheduled.
+ *  @wRunWindow     - inner SDL window pointer.
+ *  @lResources     - list of resources used between layers inside the scene.
+ *  @lRects         - list of all rects for drawing.
+ *  @sScene         - currently used scene. 
+ *  @sdlRenderer    - SDL renderer for drawing rects.
  *
  *  Defines the current active scene, processes the input, schedules all layers within that scene and
  *  renders the graphics.
@@ -59,10 +58,7 @@ typedef struct {
     char *cMainWindowName;
 
     SDL_Window *wRunWindow;
-   
-#if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
-    GLuint glShaderProgram;
-#endif
+    SDL_Renderer *sdlRenderer;
 
     tResList lResources;
     tScene *sScene;
@@ -137,6 +133,11 @@ tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) __attribute__(
 tEngineError errEngineInit(tRuntime *tRun) __attribute__((nonnull(1)));
 
 /* 
+ * @brief - exit the engine's runtime with some status.
+ * */
+void vFeatherExit(tEngineError tStatus, tRuntime *tRun);
+
+/* 
  *  @brief - creates a new instance of Rect, while initializing the drawing context.
  *
  *  Acts as a constructor for Rect structure. Rects are owned by the runtime and can only be referenced.
@@ -179,6 +180,7 @@ void vRuntimeSetWindowTitle(tRuntime *tRun, char* sTitle);
     (tRuntime) {                    \
         .uFps = 60,                 \
         .cMainWindowName = "window",\
+        .sdlRenderer = NULL,        \
         .wRunWindow = NULL,         \
         .sScene = NULL,             \
         .lResources = tll_init(),   \
@@ -191,6 +193,6 @@ void vRuntimeSetWindowTitle(tRuntime *tRun, char* sTitle);
  *  it can always be accessed via it's argument name. It is not intuitive though, that's
  *  why this macro exists
  * */
-#define tThisRuntime() tRun;
+#define tThisRuntime() __tRun;
 
 #endif
