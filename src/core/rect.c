@@ -31,92 +31,76 @@
 #include <runtime.h>
 #include <rect.h>
 #include <intrinsics.h>
+#include <log.h>
 
-// Vertex data (positions + texture coordinates)
-const float RVERTICES[] = {
-    // positions        // texture coordinates
-     0.5f,  0.5f, 0.0f,  1.0f, 1.0f,  // top right
-     0.5f, -0.5f, 0.0f,  1.0f, 0.0f,  // bottom right
-    -0.5f, -0.5f, 0.0f,  0.0f, 0.0f,  // bottom left
-    -0.5f,  0.5f, 0.0f,  0.0f, 1.0f   // top left 
-};
-
-const uint8_t DINDICES[] = {
-    0, 1, 3,   // First Triangle
-    1, 2, 3    // Second Triangle
-};
-
+// Initialize a rectangle
 tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTexturePath) {
-    // Allocate memory for the new rectangle
-    tRect *rect = (tRect*)malloc(sizeof(tRect));
-    if (!rect) return NULL; // Handle allocation failure
+    tRect rect;
+    rect.tCtx = tCtx;
+    rect.sTexturePath = sTexturePath;
+    rect.uPriority = uPriority;
 
-    rect->tCtx = tCtx;
-    rect->sTexturePath = sTexturePath;
-    rect->uPriority = uPriority;
+    // Load texture using SDL_image
+    SDL_Surface* surface = IMG_Load(sTexturePath);
+    if (!surface) {
+        vFeatherLogError("Unable to load rect texture: %s", IMG_GetError());
+        return NULL;
+    }
 
-    // Generate and bind VBO and EBO
-    glGenBuffers(1, &rect->VBO);
-    glGenBuffers(1, &rect->EBO);
+    // Generate SDL_Texture from surface
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(tRun->sdlRenderer, surface);
+    if (!texture) {
+        vFeatherLogError("Unable to create texture from surface: %s", SDL_GetError());
+        SDL_FreeSurface(surface);
+        return NULL;
+    }
+    SDL_FreeSurface(surface); // Free the surface as it's no longer needed
 
-    glBindBuffer(GL_ARRAY_BUFFER, rect->VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(RVERTICES), RVERTICES, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rect->EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(DINDICES), DINDICES, GL_STATIC_DRAW);
-
-    // Define the vertex attributes
-    // Position attribute (3 floats for position)
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-
-    // Texture coordinate attribute (2 floats for texture)
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-
-    // Unbind buffers to prevent accidental modification
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    // Store the texture in the rectangle
+    rect.idTextureID = (uintptr_t)texture;
 
     // Insert the rectangle into the list with priority handling
     tll_foreach(tRun->sScene->lRects, it) {
         if (it->item.uPriority > uPriority) {
-            tll_insert_before(tRun->sScene->lRects, it, *rect);
+            tll_insert_before(tRun->sScene->lRects, it, rect);
             return (tRect*)it->prev;
         }
     }
 
     // New higher priority rectangles are pushed to the front
-    tll_push_front(tRun->sScene->lRects, *rect);
+    tll_push_front(tRun->sScene->lRects, rect);
     return (tRect*)tRun->sScene->lRects.head;
 }
 
-/* 
- *  @brief - draws the rectangle to the screen.
- *
- *  The current position is defined by its Context2D.
- */
+// Draw the rectangle using SDL renderer
 void vDrawRect(tRuntime *tRun, tRect *rect) {
-    glUseProgram(tRun->glShaderProgram);
+    SDL_Renderer* renderer = tRun->sdlRenderer;
+    SDL_Texture* texture = (SDL_Texture*)rect->idTextureID;
 
-    // Pass the transformation matrix to the shader
-    glUniformMatrix4fv(glGetUniformLocation(tRun->glShaderProgram, "uTransform"), 1, GL_FALSE, (const float*)rect->tCtx.m4UniformMatrix);
+    float fTranslateX = rect->tCtx.m4UniformMatrix[3][0];
+    float fTranslateY = rect->tCtx.m4UniformMatrix[3][1];
+    float fScaleX = sqrtf(rect->tCtx.m4UniformMatrix[0][0] * rect->tCtx.m4UniformMatrix[0][0] +
+                          rect->tCtx.m4UniformMatrix[0][1] * rect->tCtx.m4UniformMatrix[0][1]);
+    float fScaleY = sqrtf(rect->tCtx.m4UniformMatrix[1][0] * rect->tCtx.m4UniformMatrix[1][0] +
+                          rect->tCtx.m4UniformMatrix[1][1] * rect->tCtx.m4UniformMatrix[1][1]);
+    float fRotation = atan2f(rect->tCtx.m4UniformMatrix[1][0], rect->tCtx.m4UniformMatrix[0][0]);
 
-    // Bind VBO and EBO before drawing
-    glBindBuffer(GL_ARRAY_BUFFER, rect->VBO);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, rect->EBO);
+    SDL_Rect dstRect;
+    dstRect.x = (int)fTranslateX;
+    dstRect.y = (int)fTranslateY;
+    SDL_QueryTexture(texture, NULL, NULL, &dstRect.w, &dstRect.h);
+    dstRect.w = (int)(dstRect.w * fScaleX);
+    dstRect.h = (int)(dstRect.h * fScaleY);
 
-    // Enable vertex attributes and set pointers
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    float rotationAngle = fRotation * (180.0f / M_PI);
 
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-
-    // Draw the rectangle using the index buffer
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
-
-    // Unbind the buffers after drawing
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    SDL_RenderCopyEx(
+        renderer,
+        texture,
+        NULL,
+        &dstRect,
+        rotationAngle,
+        NULL,
+        SDL_FLIP_NONE
+    );
 }
