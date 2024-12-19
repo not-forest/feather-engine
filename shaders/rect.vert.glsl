@@ -25,16 +25,21 @@
 
 #version 420 core
 
-layout(location = 0) in vec2 aPos;      // Normalized vertex position.
-layout(location = 1) in vec2 aSize;     // Rect size.
-layout(location = 2) in vec2 aOffset;   // Offset to position the rectangle.
-layout(location = 3) in vec2 aTexCoord; // Texture coordinates.
+uniform vec2 pan;           // Panning offset
+uniform float zoom;         // Zoom factor
+uniform float aspect;       // Aspect ratio
 
-uniform mat4 uTransform;                // Transformation matrix
-out vec2 oTexCoord;
+layout(location = 0) in vec4 position; // Input vertex attribute
+out vec2 texCoord;          // Output texture coordinates
 
 void main() {
-    vec2 pos = aPos * aSize + aOffset;
-    gl_Position = uTransform * vec4(pos, 0.0, 1.0);
-    oTexCoord = aTexCoord;    
+    // Apply transformations to the vertex position
+    gl_Position = vec4(position.xyz, 1.0);  
+    gl_Position.xy += pan;                  // Apply panning
+    gl_Position.xy *= zoom;                 // Apply zoom
+    gl_Position.y *= aspect;                // Apply aspect ratio adjustment
+    
+    // Calculate texture coordinates
+    texCoord = vec2(gl_Position.x, -gl_Position.y);
 }
+

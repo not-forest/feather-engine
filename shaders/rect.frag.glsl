@@ -25,14 +25,13 @@
 
 #version 420 core
 
-out vec4 FragColor;
-
-in vec2 iTexCoord;              // Texture coordinates from vertex shader
-uniform vec4 uColor;            // Color for the rectangle
-uniform sampler2D uTexture;
+in vec2 texCoord;                 // Input texture coordinates from vertex shader
+uniform sampler2D texSampler;     // Texture sampler
+uniform vec4 baseColor;           // Fallback base color
+out vec4 FragColor;               // Output fragment color
 
 void main() {
-    // Mix color and texture (Blend factor can be adjusted if needed)
-    vec4 textureColor = texture(uTexture, iTexCoord);
-    FragColor = textureColor * uColor;
+    vec4 sampledColor = texture(texSampler, texCoord);
+    FragColor = mix(baseColor, sampledColor, sampledColor.a);
 }
+
