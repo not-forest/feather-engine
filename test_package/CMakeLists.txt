@@ -9,13 +9,15 @@ set_target_properties(feather PROPERTIES
 )
 
 # Find required libraries
-find_package(SDL2 REQUIRED)
 find_package(SDL REQUIRED)
+find_package(SDL_image REQUIRED)
+find_package(SDL2 REQUIRED)
+find_package(SDL2_image REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(cglm REQUIRED)
 
 # Link dependencies to 'feather'
-target_link_libraries(feather INTERFACE SDL2::SDL2 SDL::SDL OpenGL::OpenGL cglm::cglm m)
+target_link_libraries(feather INTERFACE SDL2::SDL2 SDL::SDL SDL2_image::SDL2_image OpenGL::OpenGL cglm::cglm m)
 
 # Automatically find all test source files in src/
 file(GLOB TEST_SOURCES "${CMAKE_SOURCE_DIR}/src/*.c")
