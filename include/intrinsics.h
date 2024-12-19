@@ -33,12 +33,6 @@
 #define __FEATHER_VULKAN__ 1
 #define __FEATHER_DIRECTX__ 2
 
-#define ____BLACK____   0.0f, 0.0f, 0.0f
-#define ____WHITE____   1.0f, 1.0f, 1.0f
-#define ____RED____     1.0f, 0.0f, 0.0f 
-#define ____GREEN____   0.0f, 1.0f, 0.0f
-#define ____BLUE____    0.0f, 0.0f, 1.0f
-
 #define __FEATHER_SDL_WINDOW_FLAGS (SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE)
 #define __PUSH_WINDOW_FLAGS _Pragma("push_macro(\"__FEATHER_SDL_WINDOW_FLAGS\")") _Pragma("undef(\"__FEATHER_SDL_WINDOW_FLAGS\")")
 #define __POP_WINDOW_FLAGS _Pragma("pop_macro(\"__FEATHER_SDL_WINDOW_FLAGS\")") __FEATHER_SDL_WINDOW_FLAGS
@@ -47,21 +41,13 @@ __PUSH_WINDOW_FLAGS
 #ifdef __EMSCRIPTEN__
 
 // SDL2 is not fully compatible with emscripten.
-#include <SDL/SDL.h>
-
-#if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
-#include <SDL/SDL_opengles2.h>
-#define __FEATHER_SDL_WINDOW_FLAGS (__POP_WINDOW_FLAGS | SDL_WINDOW_OPENGL)
-#endif
+#include <SDL.h>
+#include <SDL_image.h>
 
 #else
 
 #include <SDL2/SDL.h>
-
-#if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
-#include <SDL2/SDL_opengles2.h>
-#define __FEATHER_SDL_WINDOW_FLAGS (__POP_WINDOW_FLAGS | SDL_WINDOW_OPENGL)
-#endif
+#include <SDL2/SDL_image.h>
 
 #endif
 
