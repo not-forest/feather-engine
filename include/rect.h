@@ -45,9 +45,10 @@
  * */
 typedef struct {
     char* sTexturePath;
+    uintptr_t idTextureID;
     tContext2D tCtx;
     uint16_t uPriority;   
-    GLuint VBO, EBO;   
+    SDL_Rect *sdlRect;
 } tRect;
 
 /* 
