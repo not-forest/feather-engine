@@ -33,8 +33,6 @@
 #include <intrinsics.h>
 #include <err.h>
 
-#include <shader.h>
-
 #ifndef __EMSCRIPTEN__
 /* 
  *  @brief - main engine loop. Schedules all layers within the current scene.
@@ -171,6 +169,14 @@ tEngineError errEngineInit(tRuntime *tRun) {
         __FEATHER_SDL_WINDOW_FLAGS
     );
 
+    if (tRun->wRunWindow == NULL)
+        return -errSDL_ERR;
+
+    tRun->sdlRenderer = SDL_CreateRenderer(tRun->wRunWindow, -1, SDL_RENDERER_ACCELERATED);
+
+    if (tRun->sdlRenderer == NULL)
+        return -errSDL_ERR;
+
 #if FEATHER_GRAPHICS_MANAGER == __FEATHER_OPENGL__
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
@@ -179,11 +185,10 @@ tEngineError errEngineInit(tRuntime *tRun) {
     SDL_GL_SetSwapInterval(1);                              // Updates synchronized with vertical retrace. 
 
     SDL_GL_CreateContext(tRun->wRunWindow);
-    glClearColor(____BLACK____, 1.0f);
-    vFeatherLogInfo("Using GL version: %s", glGetString(GL_VERSION));
-
-    vgraphInitShaderProgram(tRun);
+/*     vFeatherLogInfo("Using GL version: %s", glGetString(GL_VERSION)); */
 #endif
+    
+
     vFeatherLogDebug("Entering the initialization function.");
 
     return 0;
@@ -208,18 +213,12 @@ tEngineError errEngineInputHandle(tRuntime *tRun) {
         switch (sdlEvent.type) {
             case SDL_QUIT:
                 vFeatherLogInfo("Exiting...");
-                tll_free(tRun->sScene->lControllers);
-                tll_free(tRun->sScene->lLayers);
-                tll_free(tRun->sScene->lRects);
-                tll_free(tRun->lResources);
-
-                SDL_Quit();
-                exit(0);
+                vFeatherExit(0, tRun);
             default:
                 // Marking all handler function to invoke on update.
                 tll_foreach(tRun->sScene->lControllers, c) {
                     if (!c->item.invoke) {
-                        vFeatherLogInfo("%d, %d", c->item.sdlEventType, sdlEvent.type);
+/*                         vFeatherLogInfo("%d, %d", c->item.sdlEventType, sdlEvent.type); */
                         c->item.invoke = c->item.sdlEventType == sdlEvent.type;
                     }
                 }
@@ -254,15 +253,28 @@ tEngineError errEngineUpdateHandle(tRuntime *tRun) {
 
 tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) {
     //vFeatherLogDebug("Entering the rendering function with delay: %f", dDelay);
-    glClear(GL_COLOR_BUFFER_BIT);
+    SDL_RenderClear(tRun->sdlRenderer);
 
     // Drawing all rect objects to the screen.
     tll_foreach(tRun->sScene->lRects, rect) {
         vDrawRect(tRun, (tRect*)rect);
     }
 
-    SDL_GL_SwapWindow(tRun->wRunWindow);
+    SDL_RenderPresent(tRun->sdlRenderer);
     return 0;
+}
+
+/* 
+ * @brief - exit the engine's runtime with some status.
+ * */
+void vFeatherExit(tEngineError tStatus, tRuntime *tRun) {
+    tll_free(tRun->sScene->lControllers);
+    tll_free(tRun->sScene->lLayers);
+    tll_free(tRun->sScene->lRects);
+    tll_free(tRun->lResources);
+
+    SDL_Quit();
+    exit(tStatus);
 }
 
 /* 
