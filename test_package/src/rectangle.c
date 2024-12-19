@@ -36,19 +36,18 @@ void cfg(tRuntime *tRun) {
 }
 
 // This layer just creates a new rectange instance.
-FEATHER_LAYER(&Scene1, -1, RectangeLayer,
-    ,{
-        tContext2D ctx = tContextInit();                                // Creating a new 2D contexts.
-        tRuntime* this_runtime = tThisRuntime();                        // Obtaining the current runtime.
-        tRect* rect = tInitRect(this_runtime, ctx, 0, "./baboon.bmp");  // Creating new rect.
-        vContextRotate(&rect->tCtx, 45.0f);
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-              printf("%f ", rect->tCtx.m4UniformMatrix[i][j]);
-            }
-            printf("\n");
-        }
+FEATHER_LAYER(&Scene1, -1, RectangeLayer,,{
+    tContext2D ctx = tContextInit();                                // Creating a new 2D contexts.
+    vContextScale(&ctx, 0.7, 0.7);
+    tRuntime* tRun = tThisRuntime();                                // Obtaining the current runtime.
+    tRect* rect = tInitRect(tRun, ctx, 0, "assets/baboon.bmp");     // Creating new rect.
+    
+    if (rect == NULL) {
+        vFeatherLogError("Unable to create a Rect, aborting...");
+        vFeatherExit(-1, tRun);
     }
-);
+
+    vContextRotate(&rect->tCtx, 45.0f);
+});
 
 RUNTIME_CONFIGURE(cfg)
