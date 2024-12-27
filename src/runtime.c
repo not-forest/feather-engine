@@ -148,6 +148,9 @@ tEngineError errEngineInit(tRuntime *tRun) {
     if (SDL_Init( FEATHER_SDL_INIT ) < 0)
         return -errSDL_ERR;
 
+    if (IMG_Init( FEATHER_TEXTURE_FORMAT ) < 0)
+        return -errSDL_ERR;
+
     // Running user configuration here. 
     if (vRuntimeConfig)
         vRuntimeConfig(tRun); // This function shall be provided by user.
