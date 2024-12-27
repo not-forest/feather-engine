@@ -39,4 +39,44 @@ menu "Graphics"
         default "opengl"
         help
             Select the graphic management backend to use. Options: opengl, todo...
+
+    
+    menu "Feather Supported Texture Formats"
+        config FEATHER_TEXTURE_JPG
+            bool "Enable support for JPG picture format."
+            default y
+            help
+                Textures of JPG format will be supported by the internal SDL_image library.
+
+        config FEATHER_TEXTURE_PNG
+            bool "Enable support for PNG picture format."
+            default y
+            help
+                Textures of PNG format will be supported by the internal SDL_image library.
+
+        config FEATHER_TEXTURE_TIF
+            bool "Enable support for TIFF picture format."
+            default n
+            help
+                Textures of TIFF format will be supported by the internal SDL_image library.
+
+        config FEATHER_TEXTURE_WEBP
+            bool "Enable support for WebP picture format."
+            default n
+            help
+                Textures of WebP format will be supported by the internal SDL_image library.
+
+        config FEATHER_TEXTURE_JXL
+            bool "Enable support for JPEG-XL picture format."
+            default n
+            help
+                Textures of JPEG-XL format will be supported by the internal SDL_image library.
+
+        config FEATHER_TEXTURE_AVIF
+            bool "Enable support for AVIF picture format."
+            default n
+            help
+                Textures of AVIF format will be supported by the internal SDL_image library.
+    endmenu
+
 endmenu
