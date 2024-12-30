@@ -22,6 +22,7 @@
  *
  * */
 
+#include "runtime.h"
 #include <cglm/cglm.h>
 
 #include <intrinsics.h>
@@ -74,4 +75,17 @@ void vContextRotate(tContext2D *tCtx, float fDr) {
  * */
 void vApplyMatrix(tContext2D *tCtx, mat4 m4TransformMatrix) {
     glm_mat4_mul(tCtx->m4UniformMatrix, m4TransformMatrix, tCtx->m4UniformMatrix);
+}
+
+/* 
+ *  @brief - grows or shrinks rect's context to match with the full window size.
+ *
+ *  @tRct - object's rect.
+ *  @tRun - current runtime.
+ * */
+void vFullScreenRect(tRect *tRct, tRuntime *tRun) {
+    int w, h, wr, hr;
+    vRuntimeGetWindowDimensions(tRun, &w, &h);
+    SDL_QueryTexture((SDL_Texture*)tRct->idTextureID, NULL, NULL, &wr, &hr);
+    vContextScale(&tRct->tCtx, (float)w / (float)wr, (float)h / (float)hr);
 }
