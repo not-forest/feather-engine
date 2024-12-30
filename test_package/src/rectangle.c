@@ -36,18 +36,18 @@ void cfg(tRuntime *tRun) {
 }
 
 // This layer just creates a new rectange instance.
-FEATHER_LAYER(&Scene1, -1, RectangeLayer,,{
+FEATHER_LAYER(&Scene1, iPerformNTimes(1), RectangeLayer,,{
     tContext2D ctx = tContextInit();                                // Creating a new 2D contexts.
     vContextScale(&ctx, 0.7, 0.7);
     tRuntime* tRun = tThisRuntime();                                // Obtaining the current runtime.
-    tRect* rect = tInitRect(tRun, ctx, 0, "assets/baboon.bmp");     // Creating new rect.
+    tRect* tRct = tInitRect(tRun, ctx, 0, "assets/baboon.bmp");     // Creating new rect.
     
-    if (rect == NULL) {
+    if (tRct == NULL) {
         vFeatherLogError("Unable to create a Rect, aborting...");
         vFeatherExit(-1, tRun);
     }
 
-    vContextRotate(&rect->tCtx, 45.0f);
+    vContextRotate(&tRct->tCtx, 45.0f);
 });
 
 RUNTIME_CONFIGURE(cfg)
