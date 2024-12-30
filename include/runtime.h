@@ -174,6 +174,19 @@ void vRuntimeSwapScene(tRuntime *tRun, tScene *tSc);
 void vRuntimeSetWindowTitle(tRuntime *tRun, char* sTitle);
 
 /* 
+ *  @brief - gets the dimensions of the current running window.
+ * */
+void vRuntimeGetWindowDimensions(tRuntime *tRun, int *w, int *h);
+
+/* 
+ *  @brief - grows or shrinks rect's context to match with the full window size.
+ *
+ *  @tRct - object's rect.
+ *  @tRun - current runtime.
+ * */
+void vFullScreenRect(tRect *tRct, tRuntime *tRun);
+
+/* 
  *  @brief - default runtime value. Can be used and modified later.
  * */
 #define DEFAULT_RUNTIME()           \

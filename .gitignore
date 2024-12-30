@@ -53,6 +53,7 @@ dkms.conf
 build*
 compile_commands.json
 test_package/build/*
+test_package/CMakeFiles/*
 .cache
 .config
 Makefile

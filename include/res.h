@@ -63,44 +63,24 @@ typedef tll(tResource) tResList;
  *  @fPtrC - function pointer to the constructor function. It should always return data of proper type.
  *  @fPtrD - function pointer to the destructor function.
  * */
-#define FEATHER_RESOURCE(tType, fPtrC, fPtrD)            \
-    cCOUNT = __COUNTER__;                               \
-    static tType RES_ ## cCOUNT;                        \
-    __res_constructor_declare(tType, fPtrC, cCOUNT);    \
-    __res_destructor_declare(tType, fPtrC, cCOUNT);     \
+#define FEATHER_RESOURCE(tType, sName, fPtrC, fPtrD)   \
+    int sName = __COUNTER__;                           \
+    static tType RES_ ## sName;                        \
+    __res_constructor_declare(tType, fPtrC, sName);    \
+    __res_destructor_declare(tType, fPtrC, sName);
 
 // Aliases user defined constructor for runtime use.
-#define __res_constructor_declare(tType, fPtrC, cCOUNT) \  
-    tType RES_ ## cCOUNT ## constructor(void)           \
-    __attribute__((alias(#fPtrC)));                     \
+#define __res_constructor_declare(tType, fPtrC, sName) \  
+    __ext_AliasOrSkip(tType RES_ ## sName ## constructor(void*), fPtrC);
 
 // Aliases user defined destructor for runtime use.
-#define __res_destructor_declare(tType, fPtrD, cCOUNT)  \ 
-    tType RES_ ## cCOUNT ## destructor(void)            \
-    __attribute__((alias(#fPtrD)));                     \
+#define __res_destructor_declare(tType, fPtrD, sName)  \ 
+    __ext_AliasOrSkip(void RES_ ## sName ## destructor(void*, void*), fPtrD);
 
 #define tReadResource(tRes, Type) \
     (Type*)__res_read_void(tRes)
 
 #define vWriteResouce(tRes, tData) \
     __res_write_void(tRes, (void*)tData)
-
-/* 
- *  @brief - creates a new resource instance for custom use data type.
- * */
-tResource __res_new(void *vRawData);
-/* 
- *  @brief - provides the inner data type of the underlined resource.
- *
- *  @tRes - pointer to the resource location. The provided pointer should never be null.
- * */
-void* __res_read_void(tResource *tRes) __attribute__((visibility("protected"), nonnull(1)));
-/* 
- *  @brief - writes user's data type into the resource.
- *
- *  @tRes - pointer to the resource location. The provided pointer should never be null.
- *  @vRawData - pointer to new data to be written into the resource.
- * */
-void __res_write_void(tResource *tRes, void *vRawData) __attribute__((visibility("protected"), nonnull(1, 2)));
 
 #endif

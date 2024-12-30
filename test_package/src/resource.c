@@ -63,6 +63,6 @@ FEATHER_LAYER(&Scene1, 1, PlayerStatsHandler,
 );
 
 // Marking the structure as a resource. Here the destructor is not required, since no allocations are made.
-FEATHER_RESOURCE(tCharacter, constructor, NULL);
+FEATHER_RESOURCE(tCharacter, PlayerCharacter, constructor, NULL);
 // Here we configure the runtime, so we wont obtain an error.
 RUNTIME_CONFIGURE(cfg);

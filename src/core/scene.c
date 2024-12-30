@@ -57,3 +57,10 @@ void vSceneRemoveController(tScene *sScene, uint32_t uControllerID) {
         if (c->item.uControllerID == uControllerID)
             tll_remove(sScene->lControllers, c);
 }
+
+/* 
+ *  @brief - compare implementation for the layer structure.
+ * */
+bool bLayerCmp(tLayer l1, tLayer l2) {
+    return l1.iPriority < l2.iPriority;
+}

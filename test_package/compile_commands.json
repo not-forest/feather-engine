@@ -1,16 +1,32 @@
 [
-  {
-    "arguments": [
-      "/usr/bin/cc",
-      "-isystem",
-      "/home/notforest/Documents/feather-engine/test_package/../include",
-      "-c",
-      "-o",
-      "CMakeFiles/minimal.dir/src/minimal.c.o",
-      "/home/notforest/Documents/feather-engine/test_package/src/minimal.c"
-    ],
-    "directory": "/home/notforest/Documents/feather-engine/test_package",
-    "file": "/home/notforest/Documents/feather-engine/test_package/src/minimal.c",
-    "output": "/home/notforest/Documents/feather-engine/test_package/CMakeFiles/minimal.dir/src/minimal.c.o"
-  }
+{
+  "directory": "/home/notforest/Documents/feather-engine/test_package",
+  "command": "/usr/bin/cc  -isystem /home/notforest/Documents/feather-engine/test_package/../include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -o CMakeFiles/layer_counter.dir/src/layer_counter.c.o -c /home/notforest/Documents/feather-engine/test_package/src/layer_counter.c",
+  "file": "/home/notforest/Documents/feather-engine/test_package/src/layer_counter.c",
+  "output": "CMakeFiles/layer_counter.dir/src/layer_counter.c.o"
+},
+{
+  "directory": "/home/notforest/Documents/feather-engine/test_package",
+  "command": "/usr/bin/cc  -isystem /home/notforest/Documents/feather-engine/test_package/../include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -o CMakeFiles/minimal.dir/src/minimal.c.o -c /home/notforest/Documents/feather-engine/test_package/src/minimal.c",
+  "file": "/home/notforest/Documents/feather-engine/test_package/src/minimal.c",
+  "output": "CMakeFiles/minimal.dir/src/minimal.c.o"
+},
+{
+  "directory": "/home/notforest/Documents/feather-engine/test_package",
+  "command": "/usr/bin/cc  -isystem /home/notforest/Documents/feather-engine/test_package/../include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -o CMakeFiles/movement_2d.dir/src/movement_2d.c.o -c /home/notforest/Documents/feather-engine/test_package/src/movement_2d.c",
+  "file": "/home/notforest/Documents/feather-engine/test_package/src/movement_2d.c",
+  "output": "CMakeFiles/movement_2d.dir/src/movement_2d.c.o"
+},
+{
+  "directory": "/home/notforest/Documents/feather-engine/test_package",
+  "command": "/usr/bin/cc  -isystem /home/notforest/Documents/feather-engine/test_package/../include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -o CMakeFiles/rectangle.dir/src/rectangle.c.o -c /home/notforest/Documents/feather-engine/test_package/src/rectangle.c",
+  "file": "/home/notforest/Documents/feather-engine/test_package/src/rectangle.c",
+  "output": "CMakeFiles/rectangle.dir/src/rectangle.c.o"
+},
+{
+  "directory": "/home/notforest/Documents/feather-engine/test_package",
+  "command": "/usr/bin/cc  -isystem /home/notforest/Documents/feather-engine/test_package/../include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -o CMakeFiles/resource.dir/src/resource.c.o -c /home/notforest/Documents/feather-engine/test_package/src/resource.c",
+  "file": "/home/notforest/Documents/feather-engine/test_package/src/resource.c",
+  "output": "CMakeFiles/resource.dir/src/resource.c.o"
+}
 ]

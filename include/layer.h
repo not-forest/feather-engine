@@ -25,6 +25,7 @@
 
 #pragma once
 
+#include <stdbool.h>
 #ifndef FEATHER_LAYER_H
 #define FEATHER_LAYER_H
 
@@ -49,5 +50,14 @@ typedef struct {
  * */
 typedef tll(tLayer) tLayerList;
 
+/* 
+ *  @brief - compare implementation for the layer structure.
+ * */
+bool bLayerCmp(tLayer l1, tLayer l2);
+
+/* 
+ *  @brief - Returns a proper number, so that a layer will be executen N times.
+ * */
+#define iPerformNTimes(N) -(int)N
 
 #endif

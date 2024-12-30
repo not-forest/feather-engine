@@ -190,7 +190,16 @@ tEngineError errEngineInit(tRuntime *tRun) {
     SDL_GL_CreateContext(tRun->wRunWindow);
 /*     vFeatherLogInfo("Using GL version: %s", glGetString(GL_VERSION)); */
 #endif
-    
+   
+    // Sorting all appended layers.
+    tll_sort(tRun->sScene->lLayers, bLayerCmp);
+
+    // Appending all resources to the list.
+    for (double dResCnt = 0; dResCnt < __COUNTER__; ++dResCnt) {
+        vFeatherLogDebug("Constructing resource: %d", dResCnt);
+        /* void* vResPtr = RES_ ## dResCnt ## constructor((void*) tRun); 
+        tll_push_front(tRun->lResources, vResPtr); */
+    }
 
     vFeatherLogDebug("Entering the initialization function.");
 
@@ -285,4 +294,12 @@ void vFeatherExit(tEngineError tStatus, tRuntime *tRun) {
  * */
 void vRuntimeSetWindowTitle(tRuntime *tRun, char* sTitle) {
     SDL_SetWindowTitle(tRun->wRunWindow, sTitle);
+}
+
+
+/* 
+ *  @brief - gets the dimensions of the current running window.
+ * */
+void vRuntimeGetWindowDimensions(tRuntime *tRun, int *w, int *h) {
+    SDL_GetWindowSize(tRun->wRunWindow, w, h);
 }
