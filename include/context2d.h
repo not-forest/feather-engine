@@ -89,6 +89,11 @@ void vContextRotate(tContext2D *tCtx, float fDr);
 void vApplyMatrix(tContext2D *tCtx, mat4 m4TransformMatrix);
 
 /* 
+ *  @brief - saves all manual transformations and applies it to the matrix.
+ * */
+void vContextSet(tContext2D *tCtx);
+
+/* 
  *  @brief - allows to construct the context based on the provided arguments.
  *
  *  Allows to create a context by providing up to 5 variables. When some of variables are not

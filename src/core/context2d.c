@@ -78,6 +78,18 @@ void vApplyMatrix(tContext2D *tCtx, mat4 m4TransformMatrix) {
 }
 
 /* 
+ *  @brief - saves all manual transformations and applies it to the matrix.
+ * */
+void vContextSet(tContext2D *tCtx) {
+mat4 transform;
+    glm_mat4_identity(transform);
+    glm_translate(transform, (vec3){tCtx->fX, tCtx->fY, 0.0f});
+    glm_rotate_z(transform, tCtx->fRotation, transform);
+    glm_scale(transform, (vec3){tCtx->fScaleX, tCtx->fScaleY, 1.0f});
+    glm_mat4_copy(transform, tCtx->m4UniformMatrix);
+}
+
+/* 
  *  @brief - grows or shrinks rect's context to match with the full window size.
  *
  *  @tRct - object's rect.
@@ -87,5 +99,8 @@ void vFullScreenRect(tRect *tRct, tRuntime *tRun) {
     int w, h, wr, hr;
     vRuntimeGetWindowDimensions(tRun, &w, &h);
     SDL_QueryTexture((SDL_Texture*)tRct->idTextureID, NULL, NULL, &wr, &hr);
-    vContextScale(&tRct->tCtx, (float)w / (float)wr, (float)h / (float)hr);
+    tRct->tCtx.fScaleX = (float)w / (float)wr;
+    tRct->tCtx.fScaleY = (float)h / (float)hr;
+
+    vContextSet(&tRct->tCtx);
 }
