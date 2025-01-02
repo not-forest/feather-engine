@@ -36,8 +36,7 @@ void cfg(tRuntime *tRun) {
     tRun->cMainWindowName = "Game: (Menu)";
 }
 
-// Creating mutual background resource
-FEATHER_RESOURCE(tRect*, BackgroundImage, NULL, NULL);
+static tRect *BackGround = NULL;
 
 /* Main menu layer: it will wait until any key is pressed and then change to the game. */
 FEATHER_LAYER(&Menu, iPerformNTimes(1), MainMenuLayer,
@@ -45,12 +44,22 @@ FEATHER_LAYER(&Menu, iPerformNTimes(1), MainMenuLayer,
 ,{
     tRuntime *tRun = tThisRuntime();
     tContext2D tCtx = tContextInit();
-    tRect *tRct = tInitRect(tRun, tCtx, 0, "assets/baboon.bmp");
-    vFullScreenRect(tRct, tRun);
+    BackGround = tInitRect(tRun, tCtx, 0, "assets/MainMenu1.jpg");
+    vFullScreenRect(BackGround, tRun);
 
     // Creating controller that waits for any key to be pressed.
-    uint32_t tCtrl_ID = tControllerInit(tRun, SDL_KEYDOWN, &vStartGame); 
+    tControllerInit(tRun, SDL_KEYDOWN, &vStartGame); 
     vFeatherLogInfo("Main menu initialized successfully.");
+});
+
+/* Small animation for main menu button */
+FEATHER_LAYER(&Menu, 1, MainMenuAnimate, bool flag, {
+    tRuntime *tRun = tThisRuntime();
+    char *sMenuTexture = flag ? "assets/MainMenu1.jpg" : "assets/MainMenu2.jpg";
+
+    if (BackGround != NULL)
+        vChangeRectTexture(tRun, BackGround, sMenuTexture);
+    flag = !flag;
 });
 
 // Changing the scene.
@@ -66,8 +75,8 @@ FEATHER_LAYER(&Game, iPerformNTimes(1), InitGameLayer,,{
     tRuntime *tRun = tThisRuntime();
     tContext2D tCtx = tContextInit();
     // Priority -1 to make sure that background will be drawn before everything else.
-    tRect *tRct = tInitRect(tRun, tCtx, -1, "assets/baboon.bmp");
-    vFullScreenRect(tRct, tRun);
+    BackGround = tInitRect(tRun, tCtx, -1, "assets/baboon.bmp");
+    vFullScreenRect(BackGround, tRun);
 
     vFeatherLogInfo("Game loaded successfully");
 });
