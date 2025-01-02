@@ -72,6 +72,38 @@ tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTex
     return (tRect*)tRun->sScene->lRects.head;
 }
 
+/* 
+ *  @brief - changes the texture of the rect.
+ *
+ *  @tRun            - currently running runtime.
+ *  @tRct            - pointer to the rectange we wish to change
+ *  @sNewTexturePath - path to the new texture source.
+ * */
+void vChangeRectTexture(tRuntime* tRun, tRect* tRct, char* sNewTexturePath) {
+    // Unload the existing texture
+    SDL_Texture* oldTexture = (SDL_Texture*)tRct->idTextureID;
+    if (oldTexture) {
+        SDL_DestroyTexture(oldTexture);
+        tRct->idTextureID = 0; // Reset the texture ID
+    }
+    SDL_Surface* surface = IMG_Load(sNewTexturePath);
+    if (!surface) {
+        vFeatherLogError("Unable to load new texture: %s", IMG_GetError());
+        return;
+    }
+
+    SDL_Texture* newTexture = SDL_CreateTextureFromSurface(tRun->sdlRenderer, surface);
+    SDL_FreeSurface(surface);
+
+    if (!newTexture) {
+        vFeatherLogError("Unable to create new texture from surface: %s", SDL_GetError());
+        return;
+    }
+
+    tRct->idTextureID = (uintptr_t)newTexture;
+    tRct->sTexturePath = strdup(sNewTexturePath);
+} __attribute__((nonnull(1, 2)))
+
 // Draw the rectangle using SDL renderer
 void vDrawRect(tRuntime *tRun, tRect *rect) {
     SDL_Renderer* renderer = tRun->sdlRenderer;

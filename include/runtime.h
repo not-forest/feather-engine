@@ -153,9 +153,21 @@ uint32_t tControllerInit(tRuntime *tRun, SDL_EventType sdlEventType, void (fHand
 /* 
  *  @brief - draws the rectangle to the screen.
  *
+ *  @tRun - currently running runtime.
+ *  @tRct - pointer to the rectange to draw.
+ *
  *  The current position is defined by it's Context2D.
  * */
 void vDrawRect(tRuntime *tRun, tRect *rect) __attribute__((nonnull(1)));
+
+/* 
+ *  @brief - changes the texture of the rect.
+ *
+ *  @tRun            - currently running runtime.
+ *  @tRct            - pointer to the rectange we wish to change
+ *  @sNewTexturePath - path to the new texture source.
+ * */
+void vChangeRectTexture(tRuntime* tRun, tRect* tRct, char* sNewTexturePath) __attribute__((nonnull(1, 2)));
 
 /* 
  *  @brief - swaps the current scene to another one.
