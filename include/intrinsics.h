@@ -123,11 +123,6 @@ typedef float tGameUnit;
 /* Pointer to any void function with void pointer argument. */
 typedef void (*fClosure)(void*);
 
-/* Creates an alias or skips if the function pointer is NULL */
-#define __ext__AliasOrSkip(TargetFunc, AliasDecl) \
-    extern __typeof__(TargetFunc) AliasDecl       \
-    __attribute__((alias(#TargetFunc)))
-
 /* Creates a strong alias binding to another function. */
 #define __ext__StrongAlias(TargetFunc, AliasDecl)               \
     extern __typeof__ (TargetFunc) AliasDecl                    \

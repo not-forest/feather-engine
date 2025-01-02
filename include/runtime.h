@@ -35,7 +35,6 @@
 #include <stdint.h>
 #include <err.h>
 
-#include <res.h>
 #include <scene.h>
 #include <intrinsics.h>
 #include <rect.h>
@@ -60,7 +59,6 @@ typedef struct {
     SDL_Window *wRunWindow;
     SDL_Renderer *sdlRenderer;
 
-    tResList lResources;
     tScene *sScene;
 } tRuntime;
 
@@ -196,7 +194,6 @@ void vFullScreenRect(tRect *tRct, tRuntime *tRun);
         .sdlRenderer = NULL,        \
         .wRunWindow = NULL,         \
         .sScene = NULL,             \
-        .lResources = tll_init(),   \
     };
 
 /* 

@@ -30,7 +30,6 @@
 #define FEATHER_H
 
 /* Re-exported */
-#include "res.h"    
 #include "runtime.h"
 #include "scene.h"    
 #include "log.h"
