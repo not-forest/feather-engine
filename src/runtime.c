@@ -40,43 +40,43 @@
  *  Main/game loop which handles all operations within the chosen scene. The full workflow can be interpreted
  *  as so:
  *  - Processing input (I/O);
- *  - Main program update (Schedules all layers with internal scheduler/Computes physics);
+ *  - Main program update (Schedules all layers with internal scheduler/computes physics);
  *  - Renders the picture;
  *
  *  If some fatal error occurs, it will be thrown back as 'tEngineError'.
  * */
 tEngineError errMainLoop(tRuntime *tRun) {
-    time_t tCurrent, tLast, tSleep, tDelay = 0.0;
+    double tCurrent, tLast, tSleep, tDelay = 0.;
     tEngineError errResult;
 
     errResult = errEngineInit(tRun);
     if (errResult) return errResult;
 
-    vFeatherLogDebug("Entering the main loop. MS_PER_UPDATE: %f", FEATHER_UPDATE_AMOUNT);
+    vFeatherLogInfo("Entering the main loop. MS_PER_UPDATE: %d", FEATHER_MS_PER_UPDATE);
 
-    tLast = time(NULL);
-    for(;;) {
-        tCurrent = time(NULL);
+    tLast = SDL_GetTicks();
+    for (;;) {
+        tCurrent = SDL_GetTicks();
         tDelay += tCurrent - tLast;
         tLast = tCurrent;
-        
+
         errResult = errEngineInputHandle(tRun);
         if (errResult) return errResult;
 
         // Updating the game for certain amount of time passed.
-        while (tDelay >= FEATHER_UPDATE_AMOUNT) {
+        while (tDelay >= FEATHER_MS_PER_UPDATE) {
             errResult = errEngineUpdateHandle(tRun);
             if (errResult) return errResult;
-            tDelay -= FEATHER_UPDATE_AMOUNT;
+            tDelay -= FEATHER_MS_PER_UPDATE;
         }
 
         errResult = errEngineRenderHandle(tRun, tDelay);
         if (errResult) return errResult;
 
 #if FEATHER_FPS_UNLIMITED == false
-        // Sleeping for some amount of time, to not outrun the FPS amount.
-        tSleep = tCurrent + FEATHER_UPDATE_AMOUNT - time(NULL);
-        if (tSleep > 0) usleep(tSleep);
+        tSleep = 1000. / tRun->uFps - (SDL_GetTicks() - tLast);
+        if (tSleep > 0)
+            SDL_Delay((int)tSleep);
 #endif
     }
 
@@ -193,13 +193,6 @@ tEngineError errEngineInit(tRuntime *tRun) {
    
     // Sorting all appended layers.
     tll_sort(tRun->sScene->lLayers, bLayerCmp);
-
-    // Appending all resources to the list.
-    for (int dResCnt = 0; dResCnt < __COUNTER__; ++dResCnt) {
-        vFeatherLogDebug("Constructing resource: %d", dResCnt);
-        /* void* vResPtr = RES_ ## dResCnt ## constructor((void*) tRun); 
-        tll_push_front(tRun->lResources, vResPtr); */
-    }
 
     vFeatherLogDebug("Entering the initialization function.");
 

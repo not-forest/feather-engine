@@ -34,6 +34,7 @@
 #include <stdarg.h>
 #include <time.h>
 #include <lock.h>
+#include <intrinsics.h>
 
 // Maximum amount of callbacks functions.
 #ifndef FEATHER_LOG_MAX_CALLBACKS

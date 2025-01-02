@@ -148,7 +148,7 @@ tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTex
  *
  *  @return - returns an id of the new controller.
  * */
-uint32_t tControllerInit(tRuntime *tRun, SDL_EventType sdlEventType, void (fHandler)(void*));
+uint32_t tControllerInit(tRuntime *tRun, SDL_EventType sdlEventType, void (fHandler)(void*,tController*));
 
 /* 
  *  @brief - draws the rectangle to the screen.
