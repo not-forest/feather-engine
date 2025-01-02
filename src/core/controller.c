@@ -31,7 +31,7 @@
 #include <scene.h>
 
 static uint32_t CONT_COUNTER = 0;
-uint32_t tControllerInit(tRuntime *tRun, SDL_EventType sdlEventType, void (fHandler)(void*)) {
+uint32_t tControllerInit(tRuntime *tRun, SDL_EventType sdlEventType, void (fHandler)(void*,tController*)) {
     uint32_t uCCounter = ++CONT_COUNTER;
     tController tC = {
         .sdlEventType = sdlEventType,

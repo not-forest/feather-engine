@@ -232,6 +232,7 @@ tEngineError errEngineInputHandle(tRuntime *tRun) {
                     if (!c->item.invoke) {
 /*                         vFeatherLogInfo("%d, %d", c->item.sdlEventType, sdlEvent.type); */
                         c->item.invoke = c->item.sdlEventType == sdlEvent.type;
+                        c->item.sdlEvent = sdlEvent;
                     }
                 }
         }
@@ -246,7 +247,7 @@ tEngineError errEngineUpdateHandle(tRuntime *tRun) {
     // Running all controller handler functions.
     tll_foreach(tRun->sScene->lControllers, c) {
         if (c->item.invoke) {
-            c->item.fHandler(tRun);
+            c->item.fHandler(tRun, &c->item);
             c->item.invoke = false;
         }
     }

@@ -42,10 +42,11 @@
  *  @uControllerID  - identifier of this controller.
  *  @invoke         - inner flag used to identify invoked controllers.
  * */
-typedef struct {
-    void (*fHandler)(void *tRun);
+typedef struct tController {
+    void (*fHandler)(void *tRun, struct tController *tCtrl);
     SDL_EventType sdlEventType;
     uint32_t uControllerID;
+    SDL_Event sdlEvent;
     bool invoke;
 } tController;
 

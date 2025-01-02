@@ -1,7 +1,11 @@
 /**************************************************************************************************
  *  File: movement.c
  *  Desc: Shows an example of a simple 2D rpg-like game with movement mechanics, conveniently
- *  utilizing the controller structure.
+ *  utilizing the controller structure. All controllers are only defined within the scene, which means
+ *  that they will have no effect in other scenes. Controllers can also be removed, if their ID is
+ *  provided.
+ *
+ *  Assets: https://cupnooble.itch.io/sprout-lands-asset-pack
  **************************************************************************************************
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +30,7 @@
 #include <feather.h>
 #include <controller.h>
 #include <runtime.h>
+#include <scene.h>
 
 // Here we define two main scenes, that will be used within this small example.
 FEATHER_SCENE(Menu);
@@ -40,7 +45,8 @@ static tRect *BackGround = NULL;
 
 /* Main menu layer: it will wait until any key is pressed and then change to the game. */
 FEATHER_LAYER(&Menu, iPerformNTimes(1), MainMenuLayer,
-    void vStartGame(void *vRun);
+    void vStartGame(void *vRun, tController* tCtrl);
+    void vFullScreen(void *vRun, tController* tCtrl);
 ,{
     tRuntime *tRun = tThisRuntime();
     tContext2D tCtx = tContextInit();
@@ -48,7 +54,9 @@ FEATHER_LAYER(&Menu, iPerformNTimes(1), MainMenuLayer,
     vFullScreenRect(BackGround, tRun);
 
     // Creating controller that waits for any key to be pressed.
-    tControllerInit(tRun, SDL_KEYDOWN, &vStartGame); 
+    tControllerInit(tRun, SDL_KEYDOWN, &vStartGame);
+    // Added controller to adjust full screen to the main menu.
+    tControllerInit(tRun, SDL_WINDOWEVENT, &vFullScreen);
     vFeatherLogInfo("Main menu initialized successfully.");
 });
 
@@ -62,11 +70,19 @@ FEATHER_LAYER(&Menu, 1, MainMenuAnimate, bool flag, {
     flag = !flag;
 });
 
+// Adjusting the main menu image to fullscreen.
+void vFullScreen(void *vRun, tController* tCtrl) {
+    tRuntime *tRun = (tRuntime*)vRun;
+    vFullScreenRect(BackGround, tRun);
+}
+
 // Changing the scene.
-void vStartGame(void *vRun) {
+void vStartGame(void *vRun, tController* tCtrl) {
     tRuntime *tRun = (tRuntime*)vRun;
     vRuntimeSwapScene(tRun, &Game);
     vRuntimeSetWindowTitle(tRun, "Game: (Game)");
+    // Removing the controller to save RAM.
+    vSceneRemoveController(tRun->sScene, tCtrl->uControllerID);
 }
 /***************************************************************************************/
 
