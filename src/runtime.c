@@ -195,7 +195,7 @@ tEngineError errEngineInit(tRuntime *tRun) {
     tll_sort(tRun->sScene->lLayers, bLayerCmp);
 
     // Appending all resources to the list.
-    for (double dResCnt = 0; dResCnt < __COUNTER__; ++dResCnt) {
+    for (int dResCnt = 0; dResCnt < __COUNTER__; ++dResCnt) {
         vFeatherLogDebug("Constructing resource: %d", dResCnt);
         /* void* vResPtr = RES_ ## dResCnt ## constructor((void*) tRun); 
         tll_push_front(tRun->lResources, vResPtr); */
@@ -283,7 +283,6 @@ void vFeatherExit(tEngineError tStatus, tRuntime *tRun) {
     tll_free(tRun->sScene->lControllers);
     tll_free(tRun->sScene->lLayers);
     tll_free(tRun->sScene->lRects);
-    tll_free(tRun->lResources);
 
     SDL_Quit();
     exit(tStatus);

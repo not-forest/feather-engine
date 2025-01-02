@@ -25,7 +25,6 @@
  * */
 
 #include <feather.h>
-#include <stdint.h>
 
 // Creating a new scene.
 FEATHER_SCENE(Scene1);
@@ -37,32 +36,29 @@ void cfg(tRuntime *tRun) {
     tRun->cMainWindowName = "Resource Example";
 }
 
-/* Here we define a new data type, that we wish to use. */
 typedef struct {
-    uint8_t hp;
-    uint8_t speed;
+    int hp;
+    int speed;
 } tCharacter;
+static tCharacter Player = { .hp = 100, .speed = 5};
 
-/* Here we define a constructor that will be used during initialization phase. */
-tCharacter constructor(void) {
-    return (tCharacter){ .hp = 0, .speed = 0 };
-}
-
-/* If resource does some dynamic allocations, additional destructor can be implemented. (optional) */ 
-//void destructor(tCharacter *data) {};
-
-// Adding the layer.
-FEATHER_LAYER(&Scene1, 1, PlayerStatsHandler, 
-    struct {
-        uint8_t counter;
-    } myLocalStruct,
-    {
-        myLocalStruct.counter++;
-        vFeatherLogInfo("Hello from layer: %d", myLocalStruct.counter);
+// Healing
+FEATHER_LAYER(&Scene1, 1, PlayerHealerFunction,,{
+    if (Player.hp > 0) { 
+        Player.hp++;
+        vFeatherLogInfo("Player healed HP = %d", Player.hp);
     }
-);
+});
 
-// Marking the structure as a resource. Here the destructor is not required, since no allocations are made.
-FEATHER_RESOURCE(tCharacter, PlayerCharacter, constructor, NULL);
+// Loosing Hp
+FEATHER_LAYER(&Scene1, 2, PlayerHurtFunction,,{
+    if (Player.hp > 0) {
+        Player.hp -= 25; 
+        vFeatherLogInfo("Player hurt HP = %d", Player.hp);
+    } else
+        vFeatherLogFatal("Player is dead!");
+
+});
+
 // Here we configure the runtime, so we wont obtain an error.
 RUNTIME_CONFIGURE(cfg);
