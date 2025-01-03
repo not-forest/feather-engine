@@ -25,24 +25,28 @@
 
 #pragma once
 
-#include <stdbool.h>
 #ifndef FEATHER_LAYER_H
 #define FEATHER_LAYER_H
 
 #include <stdint.h>
+#include <stdbool.h>
 #include <tllist.h>
 
 /* 
  *  @brief - each layer is a user defined function that will be scheduled during update phase.
  *
- *  @fRun - actual pointer to the layer function.
- *  @iPriority - priority of which this layer is executed. Negative values are only executed on 
+ *  @fRun       - actual pointer to the layer function.
+ *  @iPriority  - priority of which this layer is executed. Negative values are only executed on 
  *  initialization according to the value they have, i.e (-2) will be runned only two times. Negative 
  *  values also have the highest priority.
+ *  @sName      - name of the layer provided by user.
+ *  @uLastSleep - used by runtime to implement sleeping layers.
  * */
 typedef struct {
     void (*fRun)(void *tRun);
-    int iPriority;  
+    int iPriority;
+    char* sName;
+    uint32_t uLastSleep;
 } tLayer;
 
 /* 
@@ -59,5 +63,25 @@ bool bLayerCmp(tLayer l1, tLayer l2);
  *  @brief - Returns a proper number, so that a layer will be executen N times.
  * */
 #define iPerformNTimes(N) -(int)N
+
+/* 
+ *  @brief - defines and appends a new layer to the scene.
+ *
+ *  Allow to define a layer and append it to the existing scene. User may define any local data
+ *  structure to use within this layer.
+ * */
+#define FEATHER_LAYER(sScene, iP, scName, anyLocal, ...)    \
+    anyLocal;                                               \
+    void scName(void *__tRun) __VA_ARGS__;                  \
+    __attribute__((constructor))                            \
+    void scName##_constructor() {                           \
+        tLayer layer = {                                    \
+            .fRun = scName,                                 \
+            .iPriority = iP,                                \
+            .sName = #scName,                               \
+            .uLastSleep = 0                                 \
+        };                                                  \
+        vSceneAppendLayer(sScene, layer);                   \
+    }
 
 #endif
