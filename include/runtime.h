@@ -103,6 +103,27 @@ tEngineError errMainLoop(void *vData) __attribute__((nonnull(1)));
 void vRuntimeConfig(tRuntime *tRun) __attribute__((nonnull(1), weak));
 
 /* 
+ *  @brief - sleep for a certain amount of milliseconds
+ *
+ *  Provided time will be same, regarding the fps limit. This function shall only be used
+ *  within the layers.
+ * */
+void __vFeatherSleepLayerMs(tRuntime *tRun, const char *sLayerName, uint32_t ms) __attribute__((nonnull(1)));
+
+/* 
+ *  @brief - returns the amount of ms the provided layer has to sleep.
+ *
+ *  This function also decrements the sleeping amount of the layer each time count.
+ * */
+int __vFeatherCheckLayerSleepMs(tRuntime *tRun, const char *sLayerName) __attribute__((nonnull(1)));
+
+#define vFeatherSleepLayerMs(tRun, sLayerName, ms)                          \
+    int ___sleep_time___ = __vFeatherCheckLayerSleepMs(tRun, #sLayerName);  \
+    if (___sleep_time___ == 0) {                                            \
+        __vFeatherSleepLayerMs(tRun, #sLayerName, ms);                      \
+    } else if (___sleep_time___ > 0) {} else
+
+/* 
  *  @brief - handles input operations to listen upcoming input from keyboard, mouse, joystick, etc.
  *
  *  Does not wait for inputs but listen to them. May work differently on different platform, especially on WASM targets.

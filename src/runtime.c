@@ -296,3 +296,44 @@ void vRuntimeSetWindowTitle(tRuntime *tRun, char* sTitle) {
 void vRuntimeGetWindowDimensions(tRuntime *tRun, int *w, int *h) {
     SDL_GetWindowSize(tRun->wRunWindow, w, h);
 }
+
+
+/* 
+ *  @brief - sleep for a certain amount of milliseconds
+ *
+ *  Provided time will be same, regarding the fps limit. This function shall only be used
+ *  within the layers.
+ * */
+void __vFeatherSleepLayerMs(tRuntime *tRun, const char *sLayerName, uint32_t ms) {
+    tll_foreach(tRun->sScene->lLayers, it) {
+        if (it->item.sName == sLayerName) {
+            it->item.uLastSleep = SDL_GetTicks() + ms;
+            return;
+        }
+    }
+
+    vFeatherLogWarn("Unable to sleep on layer: %s. Layer does not exist.", sLayerName);
+}
+
+/* 
+ *  @brief - returns the amount of ms the provided layer has to sleep.
+ *
+ *  This function also resets the sleeping amount.
+ * */
+int __vFeatherCheckLayerSleepMs(tRuntime *tRun, const char *sLayerName) {
+    tll_foreach(tRun->sScene->lLayers, it) {
+        if (it->item.sName == sLayerName) {
+            if (it->item.uLastSleep == 0) {
+                return 0;
+            } else if (SDL_GetTicks() > it->item.uLastSleep) {
+                it->item.uLastSleep = 0;
+                return -1;
+            } else {
+                return 1;
+            }
+        }
+    }
+
+    vFeatherLogWarn("Unable to check sleep on layer: %s. Layer does not exist.", sLayerName);
+    return -1;
+}

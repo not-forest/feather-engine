@@ -74,25 +74,6 @@ void vSceneAppendController(tScene *sScene, tController tCtrl) __attribute__((no
 void vSceneRemoveController(tScene *sScene, uint32_t uControllerID) __attribute__((nonnull(1)));
 
 /* 
- *  @brief - defines and appends a new layer to the scene.
- *
- *  Allow to define a layer and append it to the existing scene. User may define any local data
- *  structure to use within this layer.
- * */
-#define FEATHER_LAYER(sScene, iP, scName, anyLocal, ...)    \
-    anyLocal;                                               \
-    void scName(void *__tRun) __VA_ARGS__;                  \
-    __attribute__((constructor))                            \
-    void scName##_constructor() {                           \
-        tLayer layer = {                                    \
-            .fRun = scName,                                 \
-            .iPriority = iP                                 \
-        };                                                  \
-        vSceneAppendLayer(sScene, layer);                   \
-    }
-
-
-/* 
  *  @brief - defines new empty scene.
  * */
 #define FEATHER_SCENE(scName)           \

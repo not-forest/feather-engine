@@ -63,11 +63,13 @@ FEATHER_LAYER(&Menu, iPerformNTimes(1), MainMenuLayer,
 /* Small animation for main menu button */
 FEATHER_LAYER(&Menu, 1, MainMenuAnimate, bool flag, {
     tRuntime *tRun = tThisRuntime();
-    char *sMenuTexture = flag ? "assets/MainMenu1.jpg" : "assets/MainMenu2.jpg";
+    vFeatherSleepLayerMs(tRun, MainMenuAnimate, 1000) {
+        char *sMenuTexture = flag ? "assets/MainMenu1.jpg" : "assets/MainMenu2.jpg";
 
-    if (BackGround != NULL)
+        if (BackGround != NULL)
         vChangeRectTexture(tRun, BackGround, sMenuTexture);
-    flag = !flag;
+        flag = !flag;
+    }
 });
 
 // Adjusting the main menu image to fullscreen.
