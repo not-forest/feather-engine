@@ -42,6 +42,7 @@ void cfg(tRuntime *tRun) {
 }
 
 static tRect *BackGround = NULL;
+static tRect *Player = NULL;
 
 /* Main menu layer: it will wait until any key is pressed and then change to the game. */
 FEATHER_LAYER(&Menu, iPerformNTimes(1), MainMenuLayer,
@@ -92,15 +93,17 @@ void vStartGame(void *vRun, tController* tCtrl) {
 FEATHER_LAYER(&Game, iPerformNTimes(1), InitGameLayer,,{
     tRuntime *tRun = tThisRuntime();
     tContext2D tCtx = tContextInit();
-    // Priority -1 to make sure that background will be drawn before everything else.
-    BackGround = tInitRect(tRun, tCtx, -1, "assets/baboon.bmp");
+    // Low priority to make sure that background will be drawn before everything else.
+    BackGround = tInitRect(tRun, tCtx, 0, "assets/static_grass_bg.png");
     vFullScreenRect(BackGround, tRun);
+
+    Player = tInitRect(tRun, tCtx, 1, "assets/BasicCharacterSpriteSet.png");
 
     vFeatherLogInfo("Game loaded successfully");
 });
 
 FEATHER_LAYER(&Game, 1, UpdateGameLayer,, { 
-    vFeatherLogInfo("Updating game...");
+
 });
 
 RUNTIME_CONFIGURE(cfg);

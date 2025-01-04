@@ -117,6 +117,12 @@ void __vFeatherSleepLayerMs(tRuntime *tRun, const char *sLayerName, uint32_t ms)
  * */
 int __vFeatherCheckLayerSleepMs(tRuntime *tRun, const char *sLayerName) __attribute__((nonnull(1)));
 
+/* 
+ *  @brief - allows to define a clause that will be executed after a sleep delay.
+ *
+ *  Only content within this clause will be delayed, which won't affect anything written under it. For now several such clauses
+ *  won't work properly.
+ * */
 #define vFeatherSleepLayerMs(tRun, sLayerName, ms)                          \
     int ___sleep_time___ = __vFeatherCheckLayerSleepMs(tRun, #sLayerName);  \
     if (___sleep_time___ == 0) {                                            \

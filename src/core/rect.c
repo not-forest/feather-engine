@@ -68,7 +68,7 @@ tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTex
     }
 
     // New higher priority rectangles are pushed to the front
-    tll_push_front(tRun->sScene->lRects, rect);
+    tll_push_back(tRun->sScene->lRects, rect);
     return (tRect*)tRun->sScene->lRects.head;
 }
 
