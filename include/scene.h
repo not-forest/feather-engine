@@ -47,6 +47,9 @@ typedef struct {
     tLayerList lLayers;
     tControllerList lControllers;
     tRectList lRects;
+
+    uint32_t uCurrentRunningLayerId;
+    uint32_t uCurrentRunningControllerId;
 } tScene;
 
 /* 
@@ -82,6 +85,8 @@ void vSceneRemoveController(tScene *sScene, uint32_t uControllerID) __attribute_
         .lLayers = tll_init(),          \
         .lControllers = tll_init(),     \
         .lRects = tll_init(),           \
+        .uCurrentRunningLayerId = 0,    \
+        .uCurrentRunningControllerId = 0\
     };                                  \
 
 #endif

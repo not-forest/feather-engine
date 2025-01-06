@@ -132,6 +132,26 @@ int __vFeatherCheckLayerSleepMs(tRuntime *tRun, const char *sLayerName) __attrib
     } else if (___sleep_time___ > 0) {} else
 
 /* 
+ *  @brief - Same as the above, but do not require the layer's name.
+ * */
+#define vFeatherSleepThisLayerMs(tRun, ms)                                  \
+    const char* sLayerName = tRuntimeGetCurrentLayer(tRun)->sName;          \
+    int ___sleep_time___ = __vFeatherCheckLayerSleepMs(tRun, sLayerName);   \
+    if (___sleep_time___ == 0) {                                            \
+        __vFeatherSleepLayerMs(tRun, sLayerName, ms);                       \
+    } else if (___sleep_time___ > 0) {} else
+
+/* 
+ *  @brief - returns a pointer to the currently running layer.
+ * */
+tLayer* tRuntimeGetCurrentLayer(tRuntime *tRun) __attribute__((nonnull(1)));
+
+/* 
+ *  @brief - Removes any remained sleep time from the currently running layer.
+ * */
+void vRuntimeUnsleepCurrentLayer(tRuntime *tRun, bool ignoreNextSleep);
+
+/* 
  *  @brief - handles input operations to listen upcoming input from keyboard, mouse, joystick, etc.
  *
  *  Does not wait for inputs but listen to them. May work differently on different platform, especially on WASM targets.
@@ -223,6 +243,15 @@ void vDrawRect(tRuntime *tRun, tRect *rect) __attribute__((nonnull(1)));
  *  @sNewTexturePath - path to the new texture source.
  * */
 void vChangeRectTexture(tRuntime* tRun, tRect* tRct, char* sNewTexturePath) __attribute__((nonnull(1, 2)));
+
+/* 
+ *  @brief - Animates the rect according to the currently chosen rect.
+ *
+ *  @tRct           - the rect that shall be animated.
+ *  @uAnimationId   - id of previously appended animations.
+ *  @fSpeed         - amount of ms, before the next frame will appear.
+ * */
+void vAnimateFrame(tRuntime *tRun, tRect *tRct, uint16_t uAnimationId, float fSpeed) __attribute__((nonnull(1, 2)));
 
 /* 
  *  @brief - swaps the current scene to another one.

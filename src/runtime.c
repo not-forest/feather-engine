@@ -24,6 +24,7 @@
  *
  * */
 
+#include "layer.h"
 #include <time.h>
 #include <unistd.h>
 #include <tllist.h>
@@ -207,6 +208,7 @@ tEngineError errEngineInit(tRuntime *tRun) {
  * */
 void vRuntimeSwapScene(tRuntime *tRun, tScene *tSc) {
     tRun->sScene = tSc;
+    tll_sort(tRun->sScene->lLayers, bLayerCmp);
 }
 
 tEngineError errEngineInputHandle(tRuntime *tRun) {
@@ -222,7 +224,6 @@ tEngineError errEngineInputHandle(tRuntime *tRun) {
                 // Marking all handler function to invoke on update.
                 tll_foreach(tRun->sScene->lControllers, c) {
                     if (!c->item.invoke) {
-/*                         vFeatherLogInfo("%d, %d", c->item.sdlEventType, sdlEvent.type); */
                         c->item.invoke = c->item.sdlEventType == sdlEvent.type;
                         c->item.sdlEvent = sdlEvent;
                     }
@@ -234,20 +235,27 @@ tEngineError errEngineInputHandle(tRuntime *tRun) {
 }
 
 tEngineError errEngineUpdateHandle(tRuntime *tRun) {
+    uint32_t uCtrlId = 0, uLayerId = 0;
     //vFeatherLogDebug("Entering the update function");
     
     // Running all controller handler functions.
     tll_foreach(tRun->sScene->lControllers, c) {
         if (c->item.invoke) {
+            tRun->sScene->uCurrentRunningControllerId = uCtrlId;
             c->item.fHnd(tRun, (struct tController*) &c->item);
             c->item.invoke = false;
         }
+        ++uCtrlId;
     }
 
     // Iterating over each user defined layer and updating the application logic.
     tll_foreach(tRun->sScene->lLayers, l) {
-        if (l->item.iPriority)
+        if (l->item.iPriority) {
+            tRun->sScene->uCurrentRunningLayerId = uLayerId;
             l->item.fRun(tRun);
+            ++uLayerId;
+        } else 
+            tll_remove(tRun->sScene->lLayers, l);
 
         if (l->item.iPriority < 0)
             l->item.iPriority++;
@@ -335,4 +343,37 @@ int __vFeatherCheckLayerSleepMs(tRuntime *tRun, const char *sLayerName) {
 
     vFeatherLogWarn("Unable to check sleep on layer: %s. Layer does not exist.", sLayerName);
     return -1;
+}
+
+/* 
+ *  @brief - returns a pointer to the currently running layer.
+ *
+ *  NULL is returned if something will go wrong, even though it rather imposible...
+ * */
+tLayer* tRuntimeGetCurrentLayer(tRuntime *tRun) {
+    uint32_t uLayerID = 0;
+    tLayer *tLr = NULL;
+
+    tll_foreach(tRun->sScene->lLayers, tLayer) {
+        if (uLayerID == tRun->sScene->uCurrentRunningLayerId) {
+            tLr = &tLayer->item;
+            break;
+        }
+        ++uLayerID;
+    }
+
+    if (tLr == NULL)
+        vFeatherLogError("Internal error occured. Unable to retrieve currently running layer.");
+
+    return tLr;
+}
+
+
+/* 
+ *  @brief - Removes any remained sleep time from the currently running layer.
+ * */
+void vRuntimeUnsleepCurrentLayer(tRuntime *tRun, bool ignoreNextSleep) {
+    tLayer *tLr = tRuntimeGetCurrentLayer(tRun);
+    if (tLr != NULL)
+        tLr->uLastSleep = ignoreNextSleep;
 }
