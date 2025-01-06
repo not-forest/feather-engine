@@ -30,6 +30,7 @@
 #include <context2d.h>
 #include <controller.h>
 #include <feather.h>
+#include <rect.h>
 #include <runtime.h>
 
 // Here we define two main scenes, that will be used within this small example.
@@ -43,14 +44,18 @@ void cfg(tRuntime *tRun) {
 
 static tRect *BackGround = NULL;
 
+enum Direction { FRONT, BACK, LEFT, RIGHT };
+
 static struct {
     tRect *tRct;
     tKeyboardController tKeybCtrl;
     tGameUnit velocityX, velocityY;
+    enum Direction eDir;
 } Player = {
     .tRct = NULL,
     .velocityX = 0.f,
     .velocityY = 0.f,
+    .eDir = FRONT,
 };
 
 /* Main menu layer: it will wait until any key is pressed and then change to the game. */
@@ -110,12 +115,15 @@ FEATHER_LAYER(&Game, iPerformNTimes(1), InitGameLayer,
     void apply_speed(tGameUnit,tGameUnit)
 ,{
     tRuntime *tRun = tThisRuntime();
-    tContext2D tCtxBg = tContextInit(), tCtxPlayer = tContextInit();
+    tContext2D tCtx = tContextInit();
 
     // Low priority to make sure that background will be drawn before everything else.
-    BackGround = tInitRect(tRun, tCtxBg, 0, "assets/static_grass_bg.png");
+    BackGround = tInitRect(tRun, tCtx, 0, "assets/static_grass_bg.png");
     vFullScreenRect(BackGround, tRun);
-    Player.tRct = tInitRect(tRun, tCtxPlayer, 1, "assets/BasicCharacterSpriteSet.png");
+
+    Player.tRct = tInitRect(tRun, tCtx, 1, "assets/BasicCharacterSpriteSet.png");
+    vContextScale(&Player.tRct->tCtx, 5.f, 5.f);
+    vRectIndexate(Player.tRct, 0, 48, 48);  // Indexate values shall be chosen manually from different image assets.
 
     /* Initializing the keyboard controller. */
     vKeyboardControllerInit(tRun, &Player.tKeybCtrl);
@@ -134,11 +142,80 @@ FEATHER_LAYER(&Game, iPerformNTimes(1), InitGameLayer,
     vFeatherLogInfo("Game loaded successfully");
 });
 
-FEATHER_LAYER(&Game, 1, UpdatePlayerMovement,,{
-    if (Player.tRct != NULL) {
-        tContext2D *tCtx = &Player.tRct->tCtx;
-        vContextTranslate(tCtx, Player.velocityX, Player.velocityY);
+FEATHER_LAYER(&Game, iPerformNTimes(1), PlayerAnimationLoader,
+
+#define ANIMATION_LENGTH 2
+#define STAND_FRONT         (uint8_t[]){0, 1}
+#define WALK_FRONT          (uint8_t[]){2, 3}
+#define STAND_BACK          (uint8_t[]){4, 5}
+#define WALK_BACK           (uint8_t[]){6, 7}
+#define STAND_LEFT          (uint8_t[]){8, 9}
+#define WALK_LEFT           (uint8_t[]){10, 11}
+#define STAND_RIGHT         (uint8_t[]){12, 13}
+#define WALK_RIGHT          (uint8_t[]){14, 15}
+
+,{
+    vRectAppendAnimation(Player.tRct, STAND_FRONT, ANIMATION_LENGTH);
+    vRectAppendAnimation(Player.tRct, WALK_FRONT, ANIMATION_LENGTH);
+    vRectAppendAnimation(Player.tRct, STAND_BACK, ANIMATION_LENGTH);
+    vRectAppendAnimation(Player.tRct, WALK_BACK, ANIMATION_LENGTH);
+    vRectAppendAnimation(Player.tRct, STAND_LEFT, ANIMATION_LENGTH);
+    vRectAppendAnimation(Player.tRct, WALK_LEFT, ANIMATION_LENGTH);
+    vRectAppendAnimation(Player.tRct, STAND_RIGHT, ANIMATION_LENGTH);
+    vRectAppendAnimation(Player.tRct, WALK_RIGHT, ANIMATION_LENGTH);
+});
+
+FEATHER_LAYER(&Game, 1, UpdatePlayerMovement,
+
+#define STAND_FRONT 0
+#define WALK_FRONT  1
+#define STAND_BACK  2
+#define WALK_BACK   3
+#define STAND_LEFT  4
+#define WALK_LEFT   5
+#define STAND_RIGHT 6
+#define WALK_RIGHT  7
+
+enum Direction eLastDir = FRONT;
+
+,{
+    tRuntime *tRun = tThisRuntime();
+    tContext2D *tCtx = &Player.tRct->tCtx;
+
+    vContextTranslate(tCtx, Player.velocityX, Player.velocityY);
+
+    // For better animation responsibility when changing direction.
+    if (eLastDir != Player.eDir)
+        vRuntimeUnsleepCurrentLayer(tRun, true);
+
+    // Updating the animation based on the direction.
+    switch(Player.eDir) {
+        case FRONT:
+            if(Player.velocityY)
+                vAnimateFrame(tRun, Player.tRct, WALK_FRONT, 200); 
+            else
+                vAnimateFrame(tRun, Player.tRct, STAND_FRONT, 700); 
+            break;
+        case BACK:
+            if(Player.velocityY)
+                vAnimateFrame(tRun, Player.tRct, WALK_BACK, 200); 
+            else
+                vAnimateFrame(tRun, Player.tRct, STAND_BACK, 700); 
+            break;
+        case LEFT:
+            if(Player.velocityX)
+                vAnimateFrame(tRun, Player.tRct, WALK_LEFT, 200); 
+            else
+                vAnimateFrame(tRun, Player.tRct, STAND_LEFT, 700); 
+            break;
+        case RIGHT:
+            if(Player.velocityX)
+                vAnimateFrame(tRun, Player.tRct, WALK_RIGHT, 200); 
+            else
+                vAnimateFrame(tRun, Player.tRct, STAND_RIGHT, 700); 
+            break;
     }
+    eLastDir = Player.eDir;
 });
 
 #define dV 2.f
@@ -153,15 +230,19 @@ void stop_ad(void *tRun, tController *tCtrl) {
 }
 
 void handle_w(void *tRun, tController *tCtrl) {
+    Player.eDir = BACK;
     apply_speed(0.f, -dV);
 }
 void handle_a(void *tRun, tController *tCtrl) { 
+    Player.eDir = LEFT;
     apply_speed(-dV, 0.f);
 }
 void handle_s(void *tRun, tController *tCtrl) {
+    Player.eDir = FRONT;
     apply_speed(0.f, dV);
 }
 void handle_d(void *tRun, tController *tCtrl) { 
+    Player.eDir = RIGHT;
     apply_speed(dV, 0.f);
 }
 
