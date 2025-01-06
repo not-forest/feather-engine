@@ -29,6 +29,8 @@
 
 #pragma once
 
+#include "controller.h"
+#include <SDL_keycode.h>
 #ifndef FEATHER_RUNTIME_H
 #define FEATHER_RUNTIME_H
 
@@ -173,9 +175,35 @@ tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTex
 /* 
  *  @brief - create a new controller.
  *
+ *  @tRun           - currently running runtime.
+ *  @vUserData      - pointer to user data used within the handler.
+ *  @sdlEventType   - any event from the SDL library.
+ *  @fHnd           - pointer to the declared handler function of type (void*)(void*,tController*)
+ *
  *  @return - returns an id of the new controller.
  * */
-uint32_t tControllerInit(tRuntime *tRun, SDL_EventType sdlEventType, void (fHandler)(void*,tController*));
+uint32_t tControllerInit(tRuntime *tRun, SDL_EventType sdlEventType, void *vUserData, fHandler fHnd);
+
+/* 
+ *  @brief - gives a pointer to the controller based on the provided ID.
+ *
+ *  Will return NULL if no controller is found under such ID.
+ * */
+tController* tControllerGet(tRuntime *tRun, uint32_t uCtrlID);
+
+/* 
+ *  @brief - initializes the freshly clean keyboard controller.
+ * */
+void vKeyboardControllerInit(tRuntime *tRun, tKeyboardController *tKeybCtrl);
+
+/* 
+ *  @brief - append handler function for the keyboard controller on press event.  
+ * */
+void vKeyboardOnPress(tKeyboardController* tKeyboardCtrl, SDL_Keycode sdlKey, fHandler fHnd);
+/* 
+ *  @brief - append handler function for the keyboard controller on release event.  
+ * */
+void vKeyboardOnRelease(tKeyboardController* tKeyboardCtrl, SDL_Keycode sdlKey, fHandler fHnd);
 
 /* 
  *  @brief - draws the rectangle to the screen.
