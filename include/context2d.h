@@ -27,7 +27,6 @@
 #ifndef FEATHER_CONTEXT2D_H
 #define FEATHER_CONTEXT2D_H
 
-#include <cglm/cglm.h>
 #include <intrinsics.h>
 
 /* 
@@ -43,13 +42,11 @@
  *  @uX, uY             - coordinates of the object.
  *  @fScaleX, fScaleY   - scale scalar of the object.
  *  @fRotation          - rotation in radians of the object.
- *  @m4UniformMatrix    - pointer to the actual matrix representation.
  * */
 typedef struct {
     tGameUnit fX, fY;
     float fScaleX, fScaleY;
     float fRotation;
-    mat4 m4UniformMatrix;
 } tContext2D;
 
 /* 
@@ -81,19 +78,6 @@ void vContextScale(tContext2D *tCtx, float fDsx, float fDsy);
 void vContextRotate(tContext2D *tCtx, float fDr);
 
 /* 
- *  @brief - transforms the context based on the provided transformation matrix.
- *
- *  @tCtx               - object's context.
- *  @m4TransformMatrix  - custom tranformation matrix to apply. 
- * */
-void vApplyMatrix(tContext2D *tCtx, mat4 m4TransformMatrix);
-
-/* 
- *  @brief - saves all manual transformations and applies it to the matrix.
- * */
-void vContextSet(tContext2D *tCtx);
-
-/* 
  *  @brief - allows to construct the context based on the provided arguments.
  *
  *  Allows to create a context by providing up to 5 variables. When some of variables are not
@@ -111,7 +95,6 @@ void vContextSet(tContext2D *tCtx);
         .fScaleX = 1.f,                             \
         .fScaleY = 1.f,                             \
         .fRotation = 0.f,                           \
-        .m4UniformMatrix = GLM_MAT4_IDENTITY_INIT   \
     }
 
 #endif

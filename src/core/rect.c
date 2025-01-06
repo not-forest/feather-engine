@@ -69,7 +69,7 @@ tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTex
 
     // New higher priority rectangles are pushed to the front
     tll_push_back(tRun->sScene->lRects, rect);
-    return (tRect*)tRun->sScene->lRects.head;
+    return (tRect*)tRun->sScene->lRects.tail;
 }
 
 /* 
@@ -109,30 +109,26 @@ void vDrawRect(tRuntime *tRun, tRect *rect) {
     SDL_Renderer* renderer = tRun->sdlRenderer;
     SDL_Texture* texture = (SDL_Texture*)rect->idTextureID;
 
-    float fTranslateX = rect->tCtx.m4UniformMatrix[3][0];
-    float fTranslateY = rect->tCtx.m4UniformMatrix[3][1];
-    float fScaleX = sqrtf(rect->tCtx.m4UniformMatrix[0][0] * rect->tCtx.m4UniformMatrix[0][0] +
-                          rect->tCtx.m4UniformMatrix[0][1] * rect->tCtx.m4UniformMatrix[0][1]);
-    float fScaleY = sqrtf(rect->tCtx.m4UniformMatrix[1][0] * rect->tCtx.m4UniformMatrix[1][0] +
-                          rect->tCtx.m4UniformMatrix[1][1] * rect->tCtx.m4UniformMatrix[1][1]);
-    float fRotation = atan2f(rect->tCtx.m4UniformMatrix[1][0], rect->tCtx.m4UniformMatrix[0][0]);
-
     SDL_Rect dstRect;
-    dstRect.x = (int)fTranslateX;
-    dstRect.y = (int)fTranslateY;
+    dstRect.x = rect->tCtx.fX;
+    dstRect.y = rect->tCtx.fY;
+
     SDL_QueryTexture(texture, NULL, NULL, &dstRect.w, &dstRect.h);
-    dstRect.w = (int)(dstRect.w * fScaleX);
-    dstRect.h = (int)(dstRect.h * fScaleY);
+    dstRect.w = (dstRect.w * rect->tCtx.fScaleX);
+    dstRect.h = (dstRect.h * rect->tCtx.fScaleY);
 
-    float rotationAngle = fRotation * (180.0f / M_PI);
+    // Convert the rotation to degrees for SDL_RenderCopyEx
+    float rotationAngle = rect->tCtx.fRotation * (180.0f / M_PI);
 
+    // Render the texture with the calculated position, scale, and rotation
     SDL_RenderCopyEx(
         renderer,
         texture,
-        NULL,
-        &dstRect,
-        rotationAngle,
-        NULL,
-        SDL_FLIP_NONE
+        NULL,            // No source rectangle (full texture)
+        &dstRect,        // Destination rectangle
+        rotationAngle,   // Rotation angle in degrees
+        NULL,            // No center (rotate around the top-left corner)
+        SDL_FLIP_NONE    // No flipping
     );
 }
+

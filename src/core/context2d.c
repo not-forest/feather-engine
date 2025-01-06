@@ -40,7 +40,6 @@
 void vContextTranslate(tContext2D *tCtx, tGameUnit fDx, tGameUnit fDy) {
     tCtx->fX += fDx;
     tCtx->fY += fDy;
-    glm_translate(tCtx->m4UniformMatrix, (vec3){ tCtx->fX, tCtx->fY, 0.f});
 }
 
 /* 
@@ -53,7 +52,6 @@ void vContextTranslate(tContext2D *tCtx, tGameUnit fDx, tGameUnit fDy) {
 void vContextScale(tContext2D *tCtx, float fDsx, float fDsy) {
     tCtx->fScaleX *= fDsx;
     tCtx->fScaleY *= fDsy;
-    glm_scale(tCtx->m4UniformMatrix, (vec3){ fDsx, fDsy, 1.0f });
 }
 
 /* 
@@ -64,29 +62,6 @@ void vContextScale(tContext2D *tCtx, float fDsx, float fDsy) {
  * */
 void vContextRotate(tContext2D *tCtx, float fDr) {
     tCtx->fRotation += fDr;
-    glm_rotate_z(tCtx->m4UniformMatrix, fDr, tCtx->m4UniformMatrix);
-}
-
-/* 
- *  @brief - transforms the context based on the provided transformation matrix.
- *
- *  @tCtx               - object's context.
- *  @m4TransformMatrix  - custom tranformation matrix to apply. 
- * */
-void vApplyMatrix(tContext2D *tCtx, mat4 m4TransformMatrix) {
-    glm_mat4_mul(tCtx->m4UniformMatrix, m4TransformMatrix, tCtx->m4UniformMatrix);
-}
-
-/* 
- *  @brief - saves all manual transformations and applies it to the matrix.
- * */
-void vContextSet(tContext2D *tCtx) {
-mat4 transform;
-    glm_mat4_identity(transform);
-    glm_translate(transform, (vec3){tCtx->fX, tCtx->fY, 0.0f});
-    glm_rotate_z(transform, tCtx->fRotation, transform);
-    glm_scale(transform, (vec3){tCtx->fScaleX, tCtx->fScaleY, 1.0f});
-    glm_mat4_copy(transform, tCtx->m4UniformMatrix);
 }
 
 /* 
@@ -101,6 +76,4 @@ void vFullScreenRect(tRect *tRct, tRuntime *tRun) {
     SDL_QueryTexture((SDL_Texture*)tRct->idTextureID, NULL, NULL, &wr, &hr);
     tRct->tCtx.fScaleX = (float)w / (float)wr;
     tRct->tCtx.fScaleY = (float)h / (float)hr;
-
-    vContextSet(&tRct->tCtx);
 }
