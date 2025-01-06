@@ -42,28 +42,34 @@ tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTex
         .uPriority = uPriority, 
         .tFr.uIdx = 0 
     };
+    SDL_Surface* surface;
 
-    // Load texture using SDL_image
-    SDL_Surface* surface = IMG_Load(sTexturePath);
-    if (!surface) {
-        vFeatherLogError("Unable to load rect texture: %s", IMG_GetError());
-        return NULL;
-    }
+    if (sTexturePath == NULL) {
+        // Color can be adjusted later.
+        vChangeRectColor(tRun, &rect, (SDL_Color) { 255, 255, 255, 255 });
+    } else {
+        // Load texture using SDL_image
+        surface = IMG_Load(sTexturePath);
+        if (!surface) {
+            vFeatherLogError("Unable to load rect texture: %s", IMG_GetError());
+            return NULL;
+        }
 
-    rect.tFr.uWidth = surface->w; 
-    rect.tFr.uHeight = surface->h;
+        rect.tFr.uWidth = surface->w; 
+        rect.tFr.uHeight = surface->h;
 
-    // Generate SDL_Texture from surface
-    SDL_Texture* texture = SDL_CreateTextureFromSurface(tRun->sdlRenderer, surface);
-    if (!texture) {
-        vFeatherLogError("Unable to create texture from surface: %s", SDL_GetError());
+        // Generate SDL_Texture from surface
+        SDL_Texture* texture = SDL_CreateTextureFromSurface(tRun->sdlRenderer, surface);
+        if (!texture) {
+            vFeatherLogError("Unable to create texture from surface: %s", SDL_GetError());
+            SDL_FreeSurface(surface);
+            return NULL;
+        }
         SDL_FreeSurface(surface);
-        return NULL;
-    }
-    SDL_FreeSurface(surface);
 
-    // Store the texture in the rectangle
-    rect.idTextureID = (uintptr_t)texture;
+        // Store the texture in the rectangle
+        rect.idTextureID = (uintptr_t)texture;
+    }
 
     // Insert the rectangle into the list with priority handling
     tll_foreach(tRun->sScene->lRects, it) {
@@ -76,6 +82,51 @@ tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTex
     // New higher priority rectangles are pushed to the front
     tll_push_back(tRun->sScene->lRects, rect);
     return (tRect*)tRun->sScene->lRects.tail;
+}
+
+#include <SDL.h>
+#include <stdint.h>
+
+/* 
+ *  @brief - Change the color of the rectangle.
+ *
+ *  @tRun          - Pointer to the runtime.
+ *  @tRct          - Pointer to the rectangle.
+ *  @fallbackColor - New fallback color to apply.
+ *
+ *  This also destroys the currently applied texture. Here context2D's scaleX and scaleY decides the size of the colored block.
+ */
+void vChangeRectColor(tRuntime* tRun, tRect* tRct, SDL_Color fallbackColor) {
+    SDL_Texture* oldTexture = (SDL_Texture*)tRct->idTextureID;
+    if (oldTexture) {
+        SDL_DestroyTexture(oldTexture);
+        tRct->idTextureID = 0;
+    }
+
+    SDL_Surface* surface = SDL_CreateRGBSurfaceWithFormat(0, 
+            1 * (int)tRct->tCtx.fScaleX, 
+            1 * (int)tRct->tCtx.fScaleY, 
+            32, SDL_PIXELFORMAT_RGBA32
+    );
+
+    if (!surface) {
+        vFeatherLogError("Unable to create surface for new color: %s", SDL_GetError());
+        return;
+    }
+
+    Uint32 color = SDL_MapRGBA(surface->format, fallbackColor.r, fallbackColor.g, fallbackColor.b, fallbackColor.a);
+    SDL_FillRect(surface, NULL, color);
+    SDL_Texture* newTexture = SDL_CreateTextureFromSurface(tRun->sdlRenderer, surface);
+    SDL_FreeSurface(surface);
+
+    if (!newTexture) {
+        vFeatherLogError("Unable to create new texture for rectangle: %s", SDL_GetError());
+        return;
+    }
+
+    tRct->idTextureID = (uintptr_t)newTexture;
+    tRct->tFr.uWidth = 1 * (int)tRct->tCtx.fScaleX;
+    tRct->tFr.uHeight = 1 * (int)tRct->tCtx.fScaleY;
 }
 
 /* 

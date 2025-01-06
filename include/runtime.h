@@ -281,6 +281,17 @@ void vRuntimeGetWindowDimensions(tRuntime *tRun, int *w, int *h);
 void vFullScreenRect(tRect *tRct, tRuntime *tRun);
 
 /* 
+ *  @brief - Change the color of the rectangle.
+ *
+ *  @tRun          - Pointer to the runtime.
+ *  @tRct          - Pointer to the rectangle.
+ *  @fallbackColor - New fallback color to apply.
+ *
+ *  This also destroys the currently applied texture. Here Ctx width and height decides the size of the color.
+ */
+void vChangeRectColor(tRuntime* tRun, tRect* tRct, SDL_Color fallbackColor) __attribute__((nonnull(1, 2)));
+
+/* 
  *  @brief - default runtime value. Can be used and modified later.
  * */
 #define DEFAULT_RUNTIME()           \
