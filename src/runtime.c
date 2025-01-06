@@ -190,7 +190,6 @@ tEngineError errEngineInit(tRuntime *tRun) {
     SDL_GL_CreateContext(tRun->wRunWindow);
 /*     vFeatherLogInfo("Using GL version: %s", glGetString(GL_VERSION)); */
 #endif
-   
     // Sorting all appended layers.
     tll_sort(tRun->sScene->lLayers, bLayerCmp);
 
@@ -240,7 +239,7 @@ tEngineError errEngineUpdateHandle(tRuntime *tRun) {
     // Running all controller handler functions.
     tll_foreach(tRun->sScene->lControllers, c) {
         if (c->item.invoke) {
-            c->item.fHandler(tRun, &c->item);
+            c->item.fHnd(tRun, (struct tController*) &c->item);
             c->item.invoke = false;
         }
     }
