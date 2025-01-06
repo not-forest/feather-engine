@@ -63,7 +63,7 @@ __PUSH_WINDOW_FLAGS
 #define FEATHER_MS_PER_UPDATE 10
 #endif
 
-#define __FEATHER_SDL_DEFAULT SDL_INIT_VIDEO
+#define __FEATHER_SDL_DEFAULT SDL_INIT_VIDEO | SDL_INIT_EVENTS
 
 /* Combination of all required SDL subsystems for the program's need.  */
 #ifndef FEATHER_SDL_INIT
