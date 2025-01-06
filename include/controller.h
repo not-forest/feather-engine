@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include <SDL_keyboard.h>
 #ifndef FEATHER_CONTROLLER_H
 #define FEATHER_CONTROLLER_H
 
@@ -33,17 +34,26 @@
 #include <intrinsics.h>
 #include <tllist.h>
 
+
+struct tController;
+typedef void (*fHandler)(void *tRun, struct tController *tCtrl);
+
 /* 
  *  @brief - controller structure that allows to define handler function for keyboard
  *  input event.
  *
- *  @fHandler       - handler function for the specified event.
+ *  @fHnd           - handler function for the specified event.
+ *  @vUserData      - pointer to user data used within the handler.
  *  @sdlEvent       - specified event on which the handler function shall be invoked.
  *  @uControllerID  - identifier of this controller.
  *  @invoke         - inner flag used to identify invoked controllers.
+ *
+ *  Implementeation must ensure, that the user data still exists, while the controller is added to
+ *  the runtime environment.
  * */
-typedef struct tController {
-    void (*fHandler)(void *tRun, struct tController *tCtrl);
+typedef struct {
+    fHandler fHnd;
+    void *vUserData;
     SDL_EventType sdlEventType;
     uint32_t uControllerID;
     SDL_Event sdlEvent;
@@ -54,33 +64,41 @@ typedef struct tController {
  *  @brief - list of controllers.
  * */
 typedef tll(tController) tControllerList;
-
-typedef struct {
-    SDL_Keysym sdlKey;
-    fClosure fHandler;
-} tKeyboardHandlerPair;
+typedef struct { fHandler fHnd; SDL_Keycode sdlKey; } fKeyboardPair; 
+typedef tll(fKeyboardPair) fKeyboardHandlerPairList;
 
 /* 
  *  @brief - convenient controller for handling keyboard input.
+ *
+ *  @tKeyboardController - holds an ID of this keyboard controller handler function.
+ *
+ *  Note that several functions can be hooked up to use for the same key. To rebind, previously created controllers
+ *  must be cleaned up.
  * */
 typedef struct {
-    tController tKeyboardCtrl;
-    tll(tKeyboardHandlerPair) lOnPress;
-    tll(tKeyboardHandlerPair) lOnRelease;
-    tll(tKeyboardHandlerPair) lOnClick;
+
+    struct {
+        uint32_t uDown;
+        uint32_t uUp;
+    } tCtrlPair;
+
+    struct {
+        fKeyboardHandlerPairList sdlPressed;
+        fKeyboardHandlerPairList sdlReleased;
+    } tKeybHndPair;
+
 } tKeyboardController;
 
 /* 
- *  @brief - append handler function for the keyboard controller on press event.  
+ *  @brief - shorthand macro to cast the function to fHandler.
  * */
-void vKeyboardOnPress(tKeyboardController* tKeyboardCtrl, SDL_Keysym sdlKey, void (*fHanler)(void *uData));
+#define fControllerHandler(fHnd) (fHandler)&fHnd
+
+void __vKeyboardControllerHandlerFn(void *vRun, tController *tCtrl);
+
 /* 
- *  @brief - append handler function for the keyboard controller on release event.  
+ *  @brief - returns true if the provided key was pressed at the time of function call.
  * */
-void vKeyboardOnRelease(tKeyboardController* tKeyboardCtrl, SDL_Keysym sdlKey, void (*fHanler)(void *uData));
-/* 
- *  @brief - append handler function for the keyboard controller on click event.  
- * */
-void vKeyboardOnClick(tKeyboardController* tKeyboardCtrl, SDL_Keysym sdlKey, void (*fHanler)(void *uData));
+bool bFeatherIsKeyPressed(SDL_Scancode sdlKey);
 
 #endif
