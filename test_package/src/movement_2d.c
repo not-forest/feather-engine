@@ -27,10 +27,10 @@
  *
  * */
 
-#include <feather.h>
+#include <context2d.h>
 #include <controller.h>
+#include <feather.h>
 #include <runtime.h>
-#include <scene.h>
 
 // Here we define two main scenes, that will be used within this small example.
 FEATHER_SCENE(Menu);
@@ -42,7 +42,16 @@ void cfg(tRuntime *tRun) {
 }
 
 static tRect *BackGround = NULL;
-static tRect *Player = NULL;
+
+static struct {
+    tRect *tRct;
+    tKeyboardController tKeybCtrl;
+    tGameUnit velocityX, velocityY;
+} Player = {
+    .tRct = NULL,
+    .velocityX = 0.f,
+    .velocityY = 0.f,
+};
 
 /* Main menu layer: it will wait until any key is pressed and then change to the game. */
 FEATHER_LAYER(&Menu, iPerformNTimes(1), MainMenuLayer,
@@ -55,9 +64,9 @@ FEATHER_LAYER(&Menu, iPerformNTimes(1), MainMenuLayer,
     vFullScreenRect(BackGround, tRun);
 
     // Creating controller that waits for any key to be pressed.
-    tControllerInit(tRun, SDL_KEYDOWN, &vStartGame);
+    tControllerInit(tRun, SDL_KEYDOWN, NULL, fControllerHandler(vStartGame));
     // Added controller to adjust full screen to the main menu.
-    tControllerInit(tRun, SDL_WINDOWEVENT, &vFullScreen);
+    tControllerInit(tRun, SDL_WINDOWEVENT, NULL, fControllerHandler(vFullScreen));
     vFeatherLogInfo("Main menu initialized successfully.");
 });
 
@@ -90,20 +99,85 @@ void vStartGame(void *vRun, tController* tCtrl) {
 /***************************************************************************************/
 
 /* Game handling layers. Those will be only executed once the game is on. */
-FEATHER_LAYER(&Game, iPerformNTimes(1), InitGameLayer,,{
-    tRuntime *tRun = tThisRuntime();
-    tContext2D tCtx = tContextInit();
-    // Low priority to make sure that background will be drawn before everything else.
-    BackGround = tInitRect(tRun, tCtx, 0, "assets/static_grass_bg.png");
-    vFullScreenRect(BackGround, tRun);
+FEATHER_LAYER(&Game, iPerformNTimes(1), InitGameLayer,
+    void handle_w(void*, tController*);
+    void handle_a(void*, tController*);
+    void handle_s(void*, tController*);
+    void handle_d(void*, tController*);
+    void stop_ws(void*, tController*);
+    void stop_ad(void*, tController*);
 
-    Player = tInitRect(tRun, tCtx, 1, "assets/BasicCharacterSpriteSet.png");
+    void apply_speed(tGameUnit,tGameUnit)
+,{
+    tRuntime *tRun = tThisRuntime();
+    tContext2D tCtxBg = tContextInit(), tCtxPlayer = tContextInit();
+
+    // Low priority to make sure that background will be drawn before everything else.
+    BackGround = tInitRect(tRun, tCtxBg, 0, "assets/static_grass_bg.png");
+    vFullScreenRect(BackGround, tRun);
+    Player.tRct = tInitRect(tRun, tCtxPlayer, 1, "assets/BasicCharacterSpriteSet.png");
+
+    /* Initializing the keyboard controller. */
+    vKeyboardControllerInit(tRun, &Player.tKeybCtrl);
+
+    /* For each corresponding key, mapping the handler function. */
+    vKeyboardOnPress(&Player.tKeybCtrl, SDLK_w, fControllerHandler(handle_w));
+    vKeyboardOnPress(&Player.tKeybCtrl, SDLK_a, fControllerHandler(handle_a));
+    vKeyboardOnPress(&Player.tKeybCtrl, SDLK_s, fControllerHandler(handle_s));
+    vKeyboardOnPress(&Player.tKeybCtrl, SDLK_d, fControllerHandler(handle_d));
+    /* Releasing shall be the opposite of pressing. */
+    vKeyboardOnRelease(&Player.tKeybCtrl, SDLK_w, fControllerHandler(stop_ws));
+    vKeyboardOnRelease(&Player.tKeybCtrl, SDLK_a, fControllerHandler(stop_ad));
+    vKeyboardOnRelease(&Player.tKeybCtrl, SDLK_s, fControllerHandler(stop_ws));
+    vKeyboardOnRelease(&Player.tKeybCtrl, SDLK_d, fControllerHandler(stop_ad));
 
     vFeatherLogInfo("Game loaded successfully");
 });
 
-FEATHER_LAYER(&Game, 1, UpdateGameLayer,, { 
-
+FEATHER_LAYER(&Game, 1, UpdatePlayerMovement,,{
+    if (Player.tRct != NULL) {
+        tContext2D *tCtx = &Player.tRct->tCtx;
+        vContextTranslate(tCtx, Player.velocityX, Player.velocityY);
+    }
 });
+
+#define dV 2.f
+#define Vmin -10.f
+#define Vmax 10.f
+
+void stop_ws(void *tRun, tController *tCtrl) {
+    Player.velocityY = 0.f;
+}
+void stop_ad(void *tRun, tController *tCtrl) {
+    Player.velocityX = 0.f;
+}
+
+void handle_w(void *tRun, tController *tCtrl) {
+    apply_speed(0.f, -dV);
+}
+void handle_a(void *tRun, tController *tCtrl) { 
+    apply_speed(-dV, 0.f);
+}
+void handle_s(void *tRun, tController *tCtrl) {
+    apply_speed(0.f, dV);
+}
+void handle_d(void *tRun, tController *tCtrl) { 
+    apply_speed(dV, 0.f);
+}
+
+void apply_speed(tGameUnit dX, tGameUnit dY) {
+    tContext2D *tCtx = &Player.tRct->tCtx;
+    tGameUnit cX = tCtx->fX, cY = tCtx->fY;
+
+    if (Vmin < Player.velocityX + dX && Player.velocityX + dX < Vmax)
+        Player.velocityX += dX;
+    else
+        Player.velocityX = 0.f;
+
+    if (Vmin < Player.velocityY + dY && Player.velocityY + dY < Vmax)
+        Player.velocityY += dY;
+    else
+        Player.velocityY = 0.f;
+}
 
 RUNTIME_CONFIGURE(cfg);
