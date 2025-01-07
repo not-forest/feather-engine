@@ -6,6 +6,7 @@
  *  provided.
  *
  *  Assets: https://cupnooble.itch.io/sprout-lands-asset-pack
+ *          https://freesound.org/people/Mrthenoronha/sounds/523725/
  **************************************************************************************************
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -105,6 +106,9 @@ void vStartGame(void *vRun, tController* tCtrl) {
 
 /* Game handling layers. Those will be only executed once the game is on. */
 FEATHER_LAYER(&Game, iPerformNTimes(1), InitGameLayer,
+    uint32_t uStepSoundId;
+    uint32_t u8BitMusicId;
+
     void handle_w(void*, tController*);
     void handle_a(void*, tController*);
     void handle_s(void*, tController*);
@@ -138,6 +142,11 @@ FEATHER_LAYER(&Game, iPerformNTimes(1), InitGameLayer,
     vKeyboardOnRelease(&Player.tKeybCtrl, SDLK_a, fControllerHandler(stop_ad));
     vKeyboardOnRelease(&Player.tKeybCtrl, SDLK_s, fControllerHandler(stop_ws));
     vKeyboardOnRelease(&Player.tKeybCtrl, SDLK_d, fControllerHandler(stop_ad));
+
+    /* Loading the stepping sound. */
+    uStepSoundId = uLoadMixerSound(tRun, "assets/footstep.wav");
+    u8BitMusicId = uLoadMixerMusic(tRun, "assets/movement_example_music8bit.wav");
+    vPlayMusic(tRun, u8BitMusicId, -1); // Playing the music right away.
 
     vFeatherLogInfo("Game loaded successfully");
 });
@@ -216,6 +225,13 @@ enum Direction eLastDir = FRONT;
             break;
     }
     eLastDir = Player.eDir;
+});
+
+FEATHER_LAYER(&Game, 5, GameHandleSounds,, {
+    if (Player.velocityX || Player.velocityY) {
+        tRuntime *tRun = tThisRuntime();
+        vPlaySound(tRun, uStepSoundId, 0, 0);
+    }
 });
 
 #define dV 2.f
