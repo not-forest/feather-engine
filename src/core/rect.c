@@ -67,6 +67,7 @@ tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTex
         }
         SDL_FreeSurface(surface);
 
+        vFeatherLogInfo("Loading asset: Rect texture: %s...", strrchr(sTexturePath, '/') + 1);
         // Store the texture in the rectangle
         rect.idTextureID = (uintptr_t)texture;
     }
