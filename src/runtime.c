@@ -191,6 +191,11 @@ tEngineError errEngineInit(tRuntime *tRun) {
     SDL_GL_CreateContext(tRun->wRunWindow);
 /*     vFeatherLogInfo("Using GL version: %s", glGetString(GL_VERSION)); */
 #endif
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        vFeatherLogFatal("Unable to open SDL audio mixer: %s", Mix_GetError());
+        return -errSDL_ERR;
+    }
+
     // Sorting all appended layers.
     tll_sort(tRun->sScene->lLayers, bLayerCmp);
 
