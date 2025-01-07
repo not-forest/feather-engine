@@ -8,13 +8,15 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Wextra -pedantic -g")
 
 # Required external libraries.
 find_package(SDL2 REQUIRED)
+find_package(SDL2_image REQUIRED)
+find_package(SDL2_mixer REQUIRED)
 
 # Internal include headers.
 include_directories(feather PUBLIC include)
 file(GLOB_RECURSE SRCS src/*.c)
 add_library(feather ${SRCS})
 
-target_link_libraries(feather PUBLIC SDL2::SDL2 cglm_headers)
+target_link_libraries(feather PUBLIC SDL2_image::SDL2_image SDL2_mixer::SDL2_mixer SDL2::SDL2 cglm_headers)
 file(GLOB_RECURSE HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
 set_target_properties(feather PROPERTIES PUBLIC_HEADER "${HEADER_FILES}")
 

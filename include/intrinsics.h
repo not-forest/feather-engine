@@ -43,11 +43,13 @@ __PUSH_WINDOW_FLAGS
 // SDL2 is not fully compatible with emscripten.
 #include <SDL.h>
 #include <SDL_image.h>
+#include <SDL_mixer.h>
 
 #else
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
 
 #endif
 
@@ -63,7 +65,7 @@ __PUSH_WINDOW_FLAGS
 #define FEATHER_MS_PER_UPDATE 10
 #endif
 
-#define __FEATHER_SDL_DEFAULT SDL_INIT_VIDEO | SDL_INIT_EVENTS
+#define __FEATHER_SDL_DEFAULT SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO
 
 /* Combination of all required SDL subsystems for the program's need.  */
 #ifndef FEATHER_SDL_INIT
@@ -134,5 +136,7 @@ typedef void (*fClosure)(void*);
 /* Allows to count the amount of argument provided to the macro up to 10 */
 #define __ext_ArgCounter10(...) __ext_ArgCounter10Helper(__VA_ARGS__, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0)
 #define __ext_ArgCounter10Helper(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, COUNT, ...) COUNT
+
+struct tRuntime;
 
 #endif

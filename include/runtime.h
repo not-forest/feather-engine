@@ -29,6 +29,7 @@
 
 #pragma once
 
+#include "audio.h"
 #include "controller.h"
 #include <SDL_keycode.h>
 #ifndef FEATHER_RUNTIME_H
@@ -44,12 +45,12 @@
 /* 
  *  @brief - engine's runtime datatype structure.
  *
- *  @uFps           - amount of frames per second in which all layers within the scene should be scheduled.
- *  @wRunWindow     - inner SDL window pointer.
- *  @lResources     - list of resources used between layers inside the scene.
- *  @lRects         - list of all rects for drawing.
- *  @sScene         - currently used scene. 
- *  @sdlRenderer    - SDL renderer for drawing rects.
+ *  @uFps               - amount of frames per second in which all layers within the scene should be scheduled.
+ *  @cMainWindowName    - name shown on the currently opened SDL window.
+ *  @wRunWindow         - inner SDL window pointer.
+ *  @sScene             - currently used scene. 
+ *  @sdlRenderer        - SDL renderer for drawing rects.
+ *  @tMixer             - runtime sound mixer.
  *
  *  Defines the current active scene, processes the input, schedules all layers within that scene and
  *  renders the graphics.
@@ -60,6 +61,7 @@ typedef struct {
 
     SDL_Window *wRunWindow;
     SDL_Renderer *sdlRenderer;
+    tRuntimeMixer tMixer;
 
     tScene *sScene;
 } tRuntime;
@@ -294,13 +296,14 @@ void vChangeRectColor(tRuntime* tRun, tRect* tRct, SDL_Color fallbackColor) __at
 /* 
  *  @brief - default runtime value. Can be used and modified later.
  * */
-#define DEFAULT_RUNTIME()           \
-    (tRuntime) {                    \
-        .uFps = 60,                 \
-        .cMainWindowName = "window",\
-        .sdlRenderer = NULL,        \
-        .wRunWindow = NULL,         \
-        .sScene = NULL,             \
+#define DEFAULT_RUNTIME()                       \
+    (tRuntime) {                                \
+        .uFps = 60,                             \
+        .cMainWindowName = "Feather App",       \
+        .sdlRenderer = NULL,                    \
+        .wRunWindow = NULL,                     \
+        .sScene = NULL,                         \
+        .tMixer = { tll_init(), tll_init() }    \
     };
 
 /* 
@@ -310,6 +313,6 @@ void vChangeRectColor(tRuntime* tRun, tRect* tRct, SDL_Color fallbackColor) __at
  *  it can always be accessed via it's argument name. It is not intuitive though, that's
  *  why this macro exists
  * */
-#define tThisRuntime() __tRun;
+#define tThisRuntime() (tRuntime*)(__tRun);
 
 #endif
