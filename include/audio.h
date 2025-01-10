@@ -24,11 +24,16 @@
 
 #pragma once
 
+#include <stdbool.h>
 #ifndef FEATHER_AUDIO_H
 #define FEATHER_AUDIO_H
 
 #include <intrinsics.h>
 #include <tllist.h>
+
+#ifndef FEATHER_RUNTIME_MIXER_MAX_CHANNELS
+#define FEATHER_RUNTIME_MIXER_MAX_CHANNELS 42
+#endif
 
 typedef tll(Mix_Chunk) tsdlChunks;
 typedef tll(Mix_Music*) tsdlMusicList;
@@ -36,16 +41,19 @@ typedef tll(Mix_Music*) tsdlMusicList;
 /* 
  *  @brief - audio mixer for feather engine's runtime.
  *
- *  @tChunks    - holds different sound chunks for playing (effects, sound, ambience, c.)
+ *  @tChunks    - holds different sound chunks for playing (effects, sound, ambience, etc.)
  *  @tMusicList - holds all loaded music for playing.
- *  @tChannels  - indexated list of SDL audio channels.
+ *  @bChannels  - bitfield of currently used channels.
  *
  *  Normally one mixer is expected per runtime. It can be handler manually within some local module
- *  in the userspace.
+ *  in the userspace. By default mixer is working with the maximal value of channels, which is 42.
+ *  It can be decreased at any time during the runtime or increase above the maximum at compile time
+ *  in Kconfig.
  * */
 typedef struct {
     tsdlChunks tChunks;
     tsdlMusicList tMusicList;
+    bool bChannels[FEATHER_RUNTIME_MIXER_MAX_CHANNELS];
 } tRuntimeMixer;
 
 #endif

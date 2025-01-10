@@ -95,6 +95,7 @@ void vPlaySound(tRuntime *tRun, uint32_t uSoundID, int8_t iChannel, uint32_t uLo
                 return;
 
             Mix_PlayChannel(iChannel, &tChunk->item, uLoopCount);
+            tRun->tMixer.bChannels[iChannel] = true;
             return;
         }
         ++uId;
@@ -172,12 +173,41 @@ void vStopMusic(tRuntime *_) {
 }
 
 /* 
- *  @brief - Gets the current amount of channels.
+ *  @brief - Gets the current amount of channels from SDL.
  *
  *  @tRun - currently running runtime.
  * */
-int iMixerAmountOfChannels(tRuntime *tRun) {
+int iMixerAmountOfChannels(tRuntime *_) {
     return Mix_AllocateChannels(-1);
+}
+
+/*  
+ *  @brief      - sets the maximal amount of channels.
+ *  @tRun       - currently running runtime.
+ *  @iAmount    - maximum amount of channels to set.
+ *
+ *  Note that this shall be smaller or equal to FEATHER_RUNTIME_MIXER_MAX_CHANNELS.
+ *  */
+void vMixerSetChannelAmount(tRuntime *_, int iAmount) {
+    Mix_AllocateChannels(iAmount); 
+}
+
+/* 
+ *  @brief      - queues a sound by it's id.
+ *
+ *  @tRun       - currently running runtime.
+ *  @uSoundID   - id value obtained by the loader function.
+ *  @uLoopCount - amount of time, that this sound shall repeat itself.
+ *
+ *  Will return a warning and play nothing, if the provided sound ID does not exit. if
+ *  the queue is full, then the function will halt, until some channel will be freed.
+ *  Do not play music here.
+ * */
+void vQueueSound(tRuntime *tRun, uint32_t uSoundID, uint32_t uLoopCount) {
+    for(;;) 
+        for (uint8_t uCh = 0; uCh < FEATHER_RUNTIME_MIXER_MAX_CHANNELS; ++uCh)
+            if (!Mix_Playing(uCh)) 
+                vPlaySound(tRun, uSoundID, uCh, uLoopCount); 
 }
 
 #endif

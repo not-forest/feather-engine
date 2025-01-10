@@ -22,6 +22,11 @@
  *
  * */
 
+#pragma once
+
+#ifndef FEATHER_AUDIO_FN_H
+#define FEATHER_AUDIO_FN_H
+
 #include <runtime.h>
 #include <audio.h>
 
@@ -107,3 +112,28 @@ void vStopMusic(tRuntime *tRun);
  *  @tRun - currently running runtime.
  * */
 int iMixerAmountOfChannels(tRuntime *tRun);
+
+/*  
+ *  @brief      - sets the maximal amount of channels.
+ *  @tRun       - currently running runtime.
+ *  @iAmount    - maximum amount of channels to set.
+ *
+ *  Note that this shall be smaller or equal to FEATHER_RUNTIME_MIXER_MAX_CHANNELS.
+ *  */
+void vMixerSetChannelAmount(tRuntime *tRun, int iAmount);
+
+
+/* 
+ *  @brief      - queues a sound by it's id.
+ *
+ *  @tRun       - currently running runtime.
+ *  @uSoundID   - id value obtained by the loader function.
+ *  @uLoopCount - amount of time, that this sound shall repeat itself.
+ *
+ *  Will return a warning and play nothing, if the provided sound ID does not exit. if
+ *  the queue is full, then the function will halt, until some channel will be freed.
+ *  Do not play music here.
+ * */
+void vQueueSound(tRuntime *tRun, uint32_t uSoundID);
+
+#endif
