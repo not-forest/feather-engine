@@ -33,55 +33,62 @@
 #include <intrinsics.h>
 #include <log.h>
 
+int __vRectFromTextureRaw(tRuntime *tRun, tRect *tRct, SDL_Surface *sdlSurf) {
+    tRct->tFr.uWidth = sdlSurf->w; 
+    tRct->tFr.uHeight = sdlSurf->h;
+
+    // Generate SDL_Texture from surface
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(tRun->sdlRenderer, sdlSurf);
+    if (!texture) {
+        vFeatherLogError("Unable to create texture from surface: %s", SDL_GetError());
+        SDL_FreeSurface(sdlSurf);
+        return -1;
+    }
+    SDL_FreeSurface(sdlSurf);
+
+    // Store the texture in the rectangle
+    tRct->idTextureID = (uintptr_t)texture;
+    return 0;
+}
+
 // Initialize a rectangle
 tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTexturePath) {
-    tRect rect = { 
+    tRect tRct = { 
         .tAnims = tll_init(), 
         .tCtx = tCtx, 
         .sTexturePath = sTexturePath, 
         .uPriority = uPriority, 
         .tFr.uIdx = 0 
     };
-    SDL_Surface* surface;
 
     if (sTexturePath == NULL) {
         // Color can be adjusted later.
-        vChangeRectColor(tRun, &rect, (SDL_Color) { 255, 255, 255, 255 });
+        vChangeRectColor(tRun, &tRct, (SDL_Color) { 255, 255, 255, 255 });
     } else {
         // Load texture using SDL_image
-        surface = IMG_Load(sTexturePath);
-        if (!surface) {
+        SDL_Surface* sdlSurf;
+        sdlSurf = IMG_Load(sTexturePath);
+
+        if (!sdlSurf) {
             vFeatherLogError("Unable to load rect texture: %s", IMG_GetError());
             return NULL;
         }
 
-        rect.tFr.uWidth = surface->w; 
-        rect.tFr.uHeight = surface->h;
-
-        // Generate SDL_Texture from surface
-        SDL_Texture* texture = SDL_CreateTextureFromSurface(tRun->sdlRenderer, surface);
-        if (!texture) {
-            vFeatherLogError("Unable to create texture from surface: %s", SDL_GetError());
-            SDL_FreeSurface(surface);
+        if (__vRectFromTextureRaw(tRun, &tRct, sdlSurf) < 0)
             return NULL;
-        }
-        SDL_FreeSurface(surface);
-
         vFeatherLogInfo("Loading asset: Rect texture: %s...", strrchr(sTexturePath, '/') + 1);
-        // Store the texture in the rectangle
-        rect.idTextureID = (uintptr_t)texture;
     }
 
     // Insert the rectangle into the list with priority handling
     tll_foreach(tRun->sScene->lRects, it) {
         if (it->item.uPriority > uPriority) {
-            tll_insert_before(tRun->sScene->lRects, it, rect);
+            tll_insert_before(tRun->sScene->lRects, it, tRct);
             return (tRect*)it->prev;
         }
     }
 
     // New higher priority rectangles are pushed to the front
-    tll_push_back(tRun->sScene->lRects, rect);
+    tll_push_back(tRun->sScene->lRects, tRct);
     return (tRect*)tRun->sScene->lRects.tail;
 }
 
