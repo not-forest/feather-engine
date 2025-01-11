@@ -44,12 +44,14 @@ __PUSH_WINDOW_FLAGS
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_mixer.h>
+#include <SDL_ttf.h>
 
 #else
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 
 #endif
 
@@ -103,6 +105,9 @@ __PUSH_WINDOW_FLAGS
 #endif
 
 #endif
+
+#define __FEATHER__WHITE__ (SDL_Color){255, 255, 255, 255}
+#define __FEATHER__BLACK__ (SDL_Color){0, 0, 0, 0}
 
 /*
  *  @brief - internal engine's read function.

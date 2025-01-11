@@ -35,6 +35,7 @@
 #include <log.h>
 #include <audio.h>
 #include <audio_fn.h>
+#include <font.h>
 
 int iFeatherMain(void) __attribute__((visibility("protected")));
 

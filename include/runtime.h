@@ -282,6 +282,8 @@ void vRuntimeGetWindowDimensions(tRuntime *tRun, int *w, int *h);
  * */
 void vFullScreenRect(tRect *tRct, tRuntime *tRun);
 
+int __vRectFromTextureRaw(tRuntime *tRun, tRect *tRct, SDL_Surface *sdlSurf);
+
 /* 
  *  @brief - Change the color of the rectangle.
  *
@@ -296,14 +298,14 @@ void vChangeRectColor(tRuntime* tRun, tRect* tRct, SDL_Color fallbackColor) __at
 /* 
  *  @brief - default runtime value. Can be used and modified later.
  * */
-#define DEFAULT_RUNTIME()                       \
-    (tRuntime) {                                \
-        .uFps = 60,                             \
-        .cMainWindowName = "Feather App",       \
-        .sdlRenderer = NULL,                    \
-        .wRunWindow = NULL,                     \
-        .sScene = NULL,                         \
-        .tMixer = { tll_init(), tll_init() }    \
+#define DEFAULT_RUNTIME()                           \
+    (tRuntime) {                                    \
+        .uFps = 60,                                 \
+        .cMainWindowName = "Feather App",           \
+        .sdlRenderer = NULL,                        \
+        .wRunWindow = NULL,                         \
+        .sScene = NULL,                             \
+        .tMixer = { tll_init(), tll_init(), {0} }   \
     };
 
 /* 
