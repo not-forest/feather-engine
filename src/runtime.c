@@ -145,12 +145,26 @@ tEngineError errEmscriptenPreloop(tRuntime *tRun) {
 #endif
 
 tEngineError errEngineInit(tRuntime *tRun) { 
-    // SDL environment is initialized here.
-    if (SDL_Init( FEATHER_SDL_INIT ) < 0)
+    // SDL environment initialization part.
+    if (SDL_Init( FEATHER_SDL_INIT ) < 0) {
+        vFeatherLogFatal("Unable to load SDL environment: %s", SDL_GetError());
         return -errSDL_ERR;
+    }
 
-    if (IMG_Init( FEATHER_TEXTURE_FORMAT ) < 0)
+    if (IMG_Init( FEATHER_TEXTURE_FORMAT ) < 0) {
+        vFeatherLogFatal("Unable to load SDL graphical environment: %s", IMG_GetError());
         return -errSDL_ERR;
+    }
+
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
+        vFeatherLogFatal("Unable to open SDL audio mixer: %s", Mix_GetError());
+        return -errSDL_ERR;
+    }
+
+    if (TTF_Init() < 0) {
+        vFeatherLogFatal("Unable to load SDL TrueFont environment: %s", TTF_GetError());
+        return -errSDL_ERR;
+    }
 
     // Running user configuration here. 
     if (vRuntimeConfig)
@@ -191,10 +205,6 @@ tEngineError errEngineInit(tRuntime *tRun) {
     SDL_GL_CreateContext(tRun->wRunWindow);
 /*     vFeatherLogInfo("Using GL version: %s", glGetString(GL_VERSION)); */
 #endif
-    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) < 0) {
-        vFeatherLogFatal("Unable to open SDL audio mixer: %s", Mix_GetError());
-        return -errSDL_ERR;
-    }
 
     // Sorting all appended layers.
     tll_sort(tRun->sScene->lLayers, bLayerCmp);
