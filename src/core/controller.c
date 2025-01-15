@@ -51,6 +51,7 @@ uint32_t tControllerInit(tRuntime *tRun, SDL_EventType sdlEventType, void *vUser
         .fHnd = fHnd,
         .vUserData = vUserData,
         .uControllerID = uCCounter,
+        .uDelay = 0, .uControllerLastCalled = 0,
         .invoke = false,
     };
     vSceneAppendController(tRun->sScene, tC);

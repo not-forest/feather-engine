@@ -274,6 +274,8 @@ void vRuntimeSetWindowTitle(tRuntime *tRun, char* sTitle);
  * */
 void vRuntimeGetWindowDimensions(tRuntime *tRun, int *w, int *h);
 
+void __vFullscreenInner(tRect *tRct, tRuntime *tRun, bool w, bool h);
+
 /* 
  *  @brief - grows or shrinks rect's context to match with the full window size.
  *
@@ -281,6 +283,22 @@ void vRuntimeGetWindowDimensions(tRuntime *tRun, int *w, int *h);
  *  @tRun - current runtime.
  * */
 void vFullScreenRect(tRect *tRct, tRuntime *tRun);
+
+/* 
+ *  @brief - grows or shrinks rect's context to match with the full window width.
+ *
+ *  @tRct - object's rect.
+ *  @tRun - current runtime.
+ * */
+void vFullScreenRectWidth(tRect *tRct, tRuntime *tRun);
+
+/* 
+ *  @brief - grows or shrinks rect's context to match with the full window height.
+ *
+ *  @tRct - object's rect.
+ *  @tRun - current runtime.
+ * */
+void vFullScreenRectHeight(tRect *tRct, tRuntime *tRun);
 
 int __vRectFromTextureRaw(tRuntime *tRun, tRect *tRct, SDL_Surface *sdlSurf);
 

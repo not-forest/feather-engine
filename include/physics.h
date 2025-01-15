@@ -27,10 +27,49 @@
 #ifndef FEATHER_PHYSICS_H
 #define FEATHER_PHYSICS_H
 
+#include <tllist.h>
+
+/* 
+ *  @brief - defines a force applied to some entity, which is a movement speed with acceleration and vector.
+ *
+ *
+ *  @x,y        - vector directions and bias
+ *  @dAccel     - acceleration for the physical object. Can be adjusted on run. Defaults to 9.8 GU/s².
+ *  @dSpeed     - current speed of the entity.
+ *  @dMaxSpeed  - maximal speed, which cannot be surpassed.
+ * */
+typedef struct {
+    double x, y, dSpeed, dAccel, dMaxSpeed;
+} tForce;
+
+typedef tll(tForce) tForcesList;
+
 #include <intrinsics.h>
 #include <controller.h>
 #include <rect.h>
 #include <runtime.h>
+
+/* 
+ *  @brief - updates force's bias based on current velocity and speed.
+ *
+ *  @tFc - pointer to the force, which shall be upgraded (for example once per game tick.)
+ * */
+void vUpdateForce(tForce *tFc) __attribute__((nonnull(1)));
+
+/* 
+ *  @brief - applies the force to the provided rect.
+ * */
+void vApplyForce(tRect *tRct, tForce *tFc) __attribute__((nonnull(1, 2)));
+
+/* 
+ *  @brief - appends the forwarded force to the main force.
+ *
+ *  @tMainForce         - force that will be mutated by forwarded force.
+ *  @tForwardedForce    - force that will mutate the main force *added*.
+ *
+ *  Note that the forwarded force wont be mutated at all after this operation.
+ * */
+void vAppendForce(tForce *tMainForce, tForce *tForwardedForce) __attribute__((nonnull(1, 2)));
 
 /* 
  *  @brief - defines all physical body types.
@@ -58,9 +97,9 @@ typedef enum {
  *  @tRct               - pointer to the rect entity, which will be affected by physics.
  *  @eBodyType          - physical type of this body. This defines a lot about the behavior of this entity
  *  @uCollidersGroup    - group in which this entity appears. Only entitties within the same group collide.
- *  @dAccel             - acceleration for the physical object. Can be adjusted on run. Defaults to 9.8 GU/s².
- *  @dSpeed             - current speed of the entity.
- *  @dMaxSpeed          - maximal speed, which cannot be surpassed.
+ *  @tGForce            - main force applied to the entity, when the body type is DYNAMIC.
+ *  @tAdditionalForces  - additional forces supplied by user.
+ *  @uDelay             - delay in milliseconds, which prevents this controller from spamming too much.
  *
  * */
 typedef struct {
@@ -69,7 +108,8 @@ typedef struct {
     ePhysicalBodyType eBodyType;
     eGravityDirection eGravityDir;
     uint32_t uCollidersGroup;
-    double dSpeed, dAccel, dMaxSpeed;
+    tForce tGForce;
+    tForcesList tAdditionalForces;
     uint32_t uDelay;
 } tPhysController;
 
@@ -96,5 +136,15 @@ void vPhysicsInit(tRuntime *tRun, tPhysController *tPhys, tRect *tRct, ePhysical
  *  @dDelay - amount of delay time between controller calls in milis.
  * */
 void vPhysicsSetDelay(tRuntime *tRun, tPhysController *tPhys, double dDelay) __attribute__((nonnull(1, 2)));
+
+/* 
+ *  @brief - applies the force to the physical body, handled by physics controller.
+ *
+ *  @tPhys  - uninitialized physics controller. 
+ *  @tF     - force to apply.
+ *
+ *  The force is applied once, and removed after the first controller update.
+ * */
+void vPhysicsApplyForce(tPhysController *tPhys, tForce tF) __attribute__((nonnull(1)));
 
 #endif

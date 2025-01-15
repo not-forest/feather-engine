@@ -55,22 +55,31 @@ endif()
 
 if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include" TYPE FILE FILES
+    "/home/notforest/Documents/feather-engine/include/audio.h"
+    "/home/notforest/Documents/feather-engine/include/audio_fn.h"
     "/home/notforest/Documents/feather-engine/include/context2d.h"
     "/home/notforest/Documents/feather-engine/include/controller.h"
     "/home/notforest/Documents/feather-engine/include/err.h"
     "/home/notforest/Documents/feather-engine/include/feather.h"
+    "/home/notforest/Documents/feather-engine/include/font.h"
     "/home/notforest/Documents/feather-engine/include/intrinsics.h"
     "/home/notforest/Documents/feather-engine/include/layer.h"
     "/home/notforest/Documents/feather-engine/include/lock.h"
     "/home/notforest/Documents/feather-engine/include/log.h"
+    "/home/notforest/Documents/feather-engine/include/physics.h"
     "/home/notforest/Documents/feather-engine/include/rect.h"
-    "/home/notforest/Documents/feather-engine/include/res.h"
     "/home/notforest/Documents/feather-engine/include/runtime.h"
     "/home/notforest/Documents/feather-engine/include/scene.h"
     "/home/notforest/Documents/feather-engine/include/tllist.h"
     )
 endif()
 
+string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
+       "${CMAKE_INSTALL_MANIFEST_FILES}")
+if(CMAKE_INSTALL_LOCAL_ONLY)
+  file(WRITE "/home/notforest/Documents/feather-engine/install_local_manifest.txt"
+     "${CMAKE_INSTALL_MANIFEST_CONTENT}")
+endif()
 if(CMAKE_INSTALL_COMPONENT)
   if(CMAKE_INSTALL_COMPONENT MATCHES "^[a-zA-Z0-9_.+-]+$")
     set(CMAKE_INSTALL_MANIFEST "install_manifest_${CMAKE_INSTALL_COMPONENT}.txt")
@@ -84,8 +93,6 @@ else()
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
-       "${CMAKE_INSTALL_MANIFEST_FILES}")
   file(WRITE "/home/notforest/Documents/feather-engine/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()

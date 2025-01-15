@@ -46,6 +46,7 @@ typedef void (*fHandler)(void *tRun, struct tController *tCtrl);
  *  @vUserData      - pointer to user data used within the handler.
  *  @sdlEvent       - specified event on which the handler function shall be invoked.
  *  @uControllerID  - identifier of this controller.
+ *  @uDelay         - used by runtime to allow delays between controllers.
  *  @invoke         - inner flag used to identify invoked controllers.
  *
  *  Implementeation must ensure, that the user data still exists, while the controller is added to
@@ -57,6 +58,7 @@ typedef struct {
     SDL_EventType sdlEventType;
     uint32_t uControllerID;
     SDL_Event sdlEvent;
+    uint32_t uDelay, uControllerLastCalled;
     bool invoke;
 } tController;
 

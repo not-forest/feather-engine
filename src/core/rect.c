@@ -271,3 +271,41 @@ void vDrawRect(tRuntime *tRun, tRect *rect) {
     );
 }
 
+void __vFullscreenInner(tRect *tRct, tRuntime *tRun, bool w, bool h) {
+    int ww, wh, wr, hr;
+    vRuntimeGetWindowDimensions(tRun, &ww, &wh);
+    SDL_QueryTexture((SDL_Texture*)tRct->idTextureID, NULL, NULL, &wr, &hr);
+    tRct->tCtx.fScaleX = w ? (float)ww / (float)wr : (float)wh / (float)hr;
+    tRct->tCtx.fScaleY = h ? (float)wh / (float)hr : (float)ww / (float)wr;
+}
+
+
+/* 
+ *  @brief - grows or shrinks rect's context to match with the full window size.
+ *
+ *  @tRct - object's rect.
+ *  @tRun - current runtime.
+ * */
+void vFullScreenRect(tRect *tRct, tRuntime *tRun) {
+    __vFullscreenInner(tRct, tRun, true, true);
+}
+
+/* 
+ *  @brief - grows or shrinks rect's context to match with the full window width.
+ *
+ *  @tRct - object's rect.
+ *  @tRun - current runtime.
+ * */
+void vFullScreenRectWidth(tRect *tRct, tRuntime *tRun) {
+    __vFullscreenInner(tRct, tRun, true, false);
+}
+
+/* 
+ *  @brief - grows or shrinks rect's context to match with the full window height.
+ *
+ *  @tRct - object's rect.
+ *  @tRun - current runtime.
+ * */
+void vFullScreenRectHeight(tRect *tRct, tRuntime *tRun) {
+    __vFullscreenInner(tRct, tRun, false, true);
+}

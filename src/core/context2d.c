@@ -63,17 +63,3 @@ void vContextScale(tContext2D *tCtx, float fDsx, float fDsy) {
 void vContextRotate(tContext2D *tCtx, float fDr) {
     tCtx->fRotation += fDr;
 }
-
-/* 
- *  @brief - grows or shrinks rect's context to match with the full window size.
- *
- *  @tRct - object's rect.
- *  @tRun - current runtime.
- * */
-void vFullScreenRect(tRect *tRct, tRuntime *tRun) {
-    int w, h, wr, hr;
-    vRuntimeGetWindowDimensions(tRun, &w, &h);
-    SDL_QueryTexture((SDL_Texture*)tRct->idTextureID, NULL, NULL, &wr, &hr);
-    tRct->tCtx.fScaleX = (float)w / (float)wr;
-    tRct->tCtx.fScaleY = (float)h / (float)hr;
-}

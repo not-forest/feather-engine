@@ -256,9 +256,12 @@ tEngineError errEngineUpdateHandle(tRuntime *tRun) {
     // Running all controller handler functions.
     tll_foreach(tRun->sScene->lControllers, c) {
         if (c->item.invoke) {
-            tRun->sScene->uCurrentRunningControllerId = uCtrlId;
-            c->item.fHnd(tRun, (struct tController*) &c->item);
-            c->item.invoke = false;
+            if (c->item.uControllerLastCalled + c->item.uDelay < SDL_GetTicks()) {
+                tRun->sScene->uCurrentRunningControllerId = uCtrlId;
+                c->item.invoke = false; // Controllers may invoke themselves.
+                c->item.fHnd(tRun, (struct tController*) &c->item);
+                c->item.uControllerLastCalled = SDL_GetTicks();
+            }
         }
         ++uCtrlId;
     }

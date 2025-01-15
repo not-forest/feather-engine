@@ -1,67 +1,79 @@
 [
 {
   "directory": "/home/notforest/Documents/feather-engine",
-  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include/SDL -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/core/context2d.c.o -c /home/notforest/Documents/feather-engine/src/core/context2d.c",
+  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/core/audio.c.o -c /home/notforest/Documents/feather-engine/src/core/audio.c",
+  "file": "/home/notforest/Documents/feather-engine/src/core/audio.c",
+  "output": "CMakeFiles/feather.dir/src/core/audio.c.o"
+},
+{
+  "directory": "/home/notforest/Documents/feather-engine",
+  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/core/context2d.c.o -c /home/notforest/Documents/feather-engine/src/core/context2d.c",
   "file": "/home/notforest/Documents/feather-engine/src/core/context2d.c",
   "output": "CMakeFiles/feather.dir/src/core/context2d.c.o"
 },
 {
   "directory": "/home/notforest/Documents/feather-engine",
-  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include/SDL -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/core/controller.c.o -c /home/notforest/Documents/feather-engine/src/core/controller.c",
+  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/core/controller.c.o -c /home/notforest/Documents/feather-engine/src/core/controller.c",
   "file": "/home/notforest/Documents/feather-engine/src/core/controller.c",
   "output": "CMakeFiles/feather.dir/src/core/controller.c.o"
 },
 {
   "directory": "/home/notforest/Documents/feather-engine",
-  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include/SDL -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/core/lock.c.o -c /home/notforest/Documents/feather-engine/src/core/lock.c",
+  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/core/font.c.o -c /home/notforest/Documents/feather-engine/src/core/font.c",
+  "file": "/home/notforest/Documents/feather-engine/src/core/font.c",
+  "output": "CMakeFiles/feather.dir/src/core/font.c.o"
+},
+{
+  "directory": "/home/notforest/Documents/feather-engine",
+  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/core/lock.c.o -c /home/notforest/Documents/feather-engine/src/core/lock.c",
   "file": "/home/notforest/Documents/feather-engine/src/core/lock.c",
   "output": "CMakeFiles/feather.dir/src/core/lock.c.o"
 },
 {
   "directory": "/home/notforest/Documents/feather-engine",
-  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include/SDL -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/core/rect.c.o -c /home/notforest/Documents/feather-engine/src/core/rect.c",
+  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/core/physics.c.o -c /home/notforest/Documents/feather-engine/src/core/physics.c",
+  "file": "/home/notforest/Documents/feather-engine/src/core/physics.c",
+  "output": "CMakeFiles/feather.dir/src/core/physics.c.o"
+},
+{
+  "directory": "/home/notforest/Documents/feather-engine",
+  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/core/rect.c.o -c /home/notforest/Documents/feather-engine/src/core/rect.c",
   "file": "/home/notforest/Documents/feather-engine/src/core/rect.c",
   "output": "CMakeFiles/feather.dir/src/core/rect.c.o"
 },
 {
   "directory": "/home/notforest/Documents/feather-engine",
-  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include/SDL -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/core/res.c.o -c /home/notforest/Documents/feather-engine/src/core/res.c",
-  "file": "/home/notforest/Documents/feather-engine/src/core/res.c",
-  "output": "CMakeFiles/feather.dir/src/core/res.c.o"
-},
-{
-  "directory": "/home/notforest/Documents/feather-engine",
-  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include/SDL -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/core/scene.c.o -c /home/notforest/Documents/feather-engine/src/core/scene.c",
+  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/core/scene.c.o -c /home/notforest/Documents/feather-engine/src/core/scene.c",
   "file": "/home/notforest/Documents/feather-engine/src/core/scene.c",
   "output": "CMakeFiles/feather.dir/src/core/scene.c.o"
 },
 {
   "directory": "/home/notforest/Documents/feather-engine",
-  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include/SDL -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/feather.c.o -c /home/notforest/Documents/feather-engine/src/feather.c",
+  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/feather.c.o -c /home/notforest/Documents/feather-engine/src/feather.c",
   "file": "/home/notforest/Documents/feather-engine/src/feather.c",
   "output": "CMakeFiles/feather.dir/src/feather.c.o"
 },
 {
   "directory": "/home/notforest/Documents/feather-engine",
-  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include/SDL -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/misc/err.c.o -c /home/notforest/Documents/feather-engine/src/misc/err.c",
+  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/misc/err.c.o -c /home/notforest/Documents/feather-engine/src/misc/err.c",
   "file": "/home/notforest/Documents/feather-engine/src/misc/err.c",
   "output": "CMakeFiles/feather.dir/src/misc/err.c.o"
 },
 {
   "directory": "/home/notforest/Documents/feather-engine",
-  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include/SDL -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/misc/intrinsics.c.o -c /home/notforest/Documents/feather-engine/src/misc/intrinsics.c",
+  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/misc/intrinsics.c.o -c /home/notforest/Documents/feather-engine/src/misc/intrinsics.c",
   "file": "/home/notforest/Documents/feather-engine/src/misc/intrinsics.c",
   "output": "CMakeFiles/feather.dir/src/misc/intrinsics.c.o"
 },
 {
   "directory": "/home/notforest/Documents/feather-engine",
-  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include/SDL -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/misc/log.c.o -c /home/notforest/Documents/feather-engine/src/misc/log.c",
+  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/misc/log.c.o -c /home/notforest/Documents/feather-engine/src/misc/log.c",
   "file": "/home/notforest/Documents/feather-engine/src/misc/log.c",
   "output": "CMakeFiles/feather.dir/src/misc/log.c.o"
 },
 {
   "directory": "/home/notforest/Documents/feather-engine",
-  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include/SDL -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/runtime.c.o -c /home/notforest/Documents/feather-engine/src/runtime.c",
+  "command": "/usr/bin/cc -DPROJECT_ROOT_PATH=\\\"/home/notforest/Documents/feather-engine\\\" -I/home/notforest/Documents/feather-engine/feather -I/home/notforest/Documents/feather-engine/PUBLIC -I/home/notforest/Documents/feather-engine/include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -Wall -Wextra -pedantic -g -o CMakeFiles/feather.dir/src/runtime.c.o -c /home/notforest/Documents/feather-engine/src/runtime.c",
   "file": "/home/notforest/Documents/feather-engine/src/runtime.c",
   "output": "CMakeFiles/feather.dir/src/runtime.c.o"
 }

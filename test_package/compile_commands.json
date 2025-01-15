@@ -1,9 +1,21 @@
 [
 {
   "directory": "/home/notforest/Documents/feather-engine/test_package",
+  "command": "/usr/bin/cc  -isystem /home/notforest/Documents/feather-engine/test_package/../include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -o CMakeFiles/flappy.dir/src/flappy.c.o -c /home/notforest/Documents/feather-engine/test_package/src/flappy.c",
+  "file": "/home/notforest/Documents/feather-engine/test_package/src/flappy.c",
+  "output": "CMakeFiles/flappy.dir/src/flappy.c.o"
+},
+{
+  "directory": "/home/notforest/Documents/feather-engine/test_package",
   "command": "/usr/bin/cc  -isystem /home/notforest/Documents/feather-engine/test_package/../include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -o CMakeFiles/layer_counter.dir/src/layer_counter.c.o -c /home/notforest/Documents/feather-engine/test_package/src/layer_counter.c",
   "file": "/home/notforest/Documents/feather-engine/test_package/src/layer_counter.c",
   "output": "CMakeFiles/layer_counter.dir/src/layer_counter.c.o"
+},
+{
+  "directory": "/home/notforest/Documents/feather-engine/test_package",
+  "command": "/usr/bin/cc  -isystem /home/notforest/Documents/feather-engine/test_package/../include -isystem /usr/local/include -isystem /usr/local/include/SDL2  -o CMakeFiles/life.dir/src/life.c.o -c /home/notforest/Documents/feather-engine/test_package/src/life.c",
+  "file": "/home/notforest/Documents/feather-engine/test_package/src/life.c",
+  "output": "CMakeFiles/life.dir/src/life.c.o"
 },
 {
   "directory": "/home/notforest/Documents/feather-engine/test_package",
