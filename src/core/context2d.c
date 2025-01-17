@@ -22,9 +22,6 @@
  *
  * */
 
-#include "runtime.h"
-#include <cglm/cglm.h>
-
 #include <intrinsics.h>
 #include <context2d.h>
 

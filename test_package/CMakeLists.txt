@@ -14,10 +14,9 @@ find_package(SDL2_image REQUIRED)
 find_package(SDL2_mixer REQUIRED)
 find_package(SDL2_ttf REQUIRED)
 find_package(OpenGL REQUIRED)
-find_package(cglm REQUIRED)
 
 # Link dependencies to 'feather'
-target_link_libraries(feather INTERFACE SDL2::SDL2 SDL2_mixer::SDL2_mixer SDL2_image::SDL2_image OpenGL::OpenGL SDL2_ttf::SDL2_ttf cglm::cglm m)
+target_link_libraries(feather INTERFACE SDL2::SDL2 SDL2_mixer::SDL2_mixer SDL2_image::SDL2_image OpenGL::OpenGL SDL2_ttf::SDL2_ttf m)
 
 # Automatically find all test source files in src/
 file(GLOB TEST_SOURCES "${CMAKE_SOURCE_DIR}/src/*.c")
