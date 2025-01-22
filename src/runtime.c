@@ -71,7 +71,7 @@ tEngineError errMainLoop(tRuntime *tRun) {
             tDelay -= FEATHER_MS_PER_UPDATE;
         }
 
-        errResult = errEngineRenderHandle(tRun, tDelay);
+        errResult = errEngineRenderHandle(tRun);
         if (errResult) return errResult;
 
 #if FEATHER_FPS_UNLIMITED == false
@@ -107,7 +107,7 @@ void errMainLoop(void *vData) {
         sHelper->tDelay -= FEATHER_UPDATE_AMOUNT;
     }
 
-    /* errResult = errEngineRenderHandle(tRun, tDelay);
+    /* errResult = errEngineRenderHandle(tRun);
     if (errResult) return errResult; */
 
 #if FEATHER_FPS_UNLIMITED == false
@@ -233,7 +233,6 @@ tEngineError errEngineInputHandle(tRuntime *tRun) {
     while (SDL_PollEvent( &sdlEvent )) {
         switch (sdlEvent.type) {
             case SDL_QUIT:
-                vFeatherLogInfo("Exiting...");
                 vFeatherExit(0, tRun);
             default:
                 // Marking all handler function to invoke on update.
@@ -282,7 +281,7 @@ tEngineError errEngineUpdateHandle(tRuntime *tRun) {
     return 0;
 }
 
-tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) {
+tEngineError errEngineRenderHandle(tRuntime *tRun) {
     //vFeatherLogDebug("Entering the rendering function with delay: %f", dDelay);
     SDL_RenderClear(tRun->sdlRenderer);
 
@@ -299,6 +298,7 @@ tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) {
  * @brief - exit the engine's runtime with some status.
  * */
 void vFeatherExit(tEngineError tStatus, tRuntime *tRun) {
+    vFeatherLogInfo("Exiting...");
     tll_free(tRun->sScene->lControllers);
     tll_free(tRun->sScene->lLayers);
     tll_free(tRun->sScene->lRects);
