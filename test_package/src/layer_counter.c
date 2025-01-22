@@ -41,10 +41,17 @@ FEATHER_LAYER(&Scene1, 1, LocalCounterIncrementationLayer, // The name is provid
     struct {
         uint8_t counter;
     } myLocalStruct;
-    const char MY_LOCAL_CONST[] = "DEADBEEF";
+    const char MY_LOCAL_CONST[] = "USER";
     ,{
-        myLocalStruct.counter++;
-        vFeatherLogInfo("Hello %s.Incrementing local counter: %d", MY_LOCAL_CONST, myLocalStruct.counter);
+        tRuntime *tRun = tThisRuntime();
+
+        vFeatherSleepThisLayerMs(tRun, 1000) {
+            myLocalStruct.counter++;
+            vFeatherLogInfo("Hello %s.Incrementing local counter: %d", MY_LOCAL_CONST, myLocalStruct.counter);
+
+            if (myLocalStruct.counter > 10)
+                vFeatherExit(0, tRun);
+        }
     }
 );
 
