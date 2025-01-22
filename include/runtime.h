@@ -172,7 +172,7 @@ tEngineError errEngineUpdateHandle(tRuntime *tRun) __attribute__((weak, nonnull(
 /* 
  *  @brief - handles the rendering phase with graphics libraries based on provided physical resources.
  * */
-tEngineError errEngineRenderHandle(tRuntime *tRun, double dDelay) __attribute__((weak, nonnull(1)));
+tEngineError errEngineRenderHandle(tRuntime *tRun) __attribute__((weak, nonnull(1)));
 
 /* 
  *  @brief - initialization part that executed before entering the main loop.

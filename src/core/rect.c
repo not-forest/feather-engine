@@ -257,7 +257,8 @@ void vDrawRect(tRuntime *tRun, tRect *rect) {
     dstRect.w = (int)(srcRect.w * rect->tCtx.fScaleX);
     dstRect.h = (int)(srcRect.h * rect->tCtx.fScaleY);
 
-    float rotationAngle = rect->tCtx.fRotation * (180.0f / M_PI);
+    sdlCenter.x = dstRect.x + dstRect.w / 2;
+    sdlCenter.y = dstRect.y + dstRect.h / 2;
 
     // Render the texture with the calculated position, scale, and rotation
     SDL_RenderCopyEx(
@@ -265,7 +266,7 @@ void vDrawRect(tRuntime *tRun, tRect *rect) {
         texture,
         &srcRect, 
         &dstRect,     
-        rotationAngle,
+        rect->tCtx.fRotation,
         &sdlCenter,
         SDL_FLIP_NONE
     );

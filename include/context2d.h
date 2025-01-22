@@ -45,8 +45,8 @@
  * */
 typedef struct {
     tGameUnit fX, fY;
-    float fScaleX, fScaleY;
-    float fRotation;
+    double fScaleX, fScaleY;
+    double fRotation;
 } tContext2D;
 
 /* 
@@ -92,9 +92,9 @@ void vContextRotate(tContext2D *tCtx, float fDr);
     (tContext2D) {                                  \
         .fX = 0,                                    \
         .fY = 0,                                    \
-        .fScaleX = 1.f,                             \
-        .fScaleY = 1.f,                             \
-        .fRotation = 0.f,                           \
+        .fScaleX = 1.,                              \
+        .fScaleY = 1.,                              \
+        .fRotation = 0.,                            \
     }
 
 #endif
