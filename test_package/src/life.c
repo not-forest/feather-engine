@@ -30,11 +30,11 @@
  * */
 
 #include <feather.h>
-#include <runtime.h>
+#include <font.h>
 #include <stdlib.h>
 #include <time.h>
 
-#define CANVAS_SIZE 50
+#define CANVAS_SIZE 40
 #define BLOCK_SIZE 15
 
 struct {
@@ -56,6 +56,7 @@ FEATHER_LAYER(&GoL, iPerformNTimes(1), InitGameCanvas,
     void vRestartBoard(void*,tController*);
     void vGameOfLife(tRuntime*,int,int);    
     tKeyboardController tRestartButton; 
+    tText tTxt;
 ,{
     srand(time(NULL));
     tRuntime *tRun = tThisRuntime();
@@ -64,11 +65,14 @@ FEATHER_LAYER(&GoL, iPerformNTimes(1), InitGameCanvas,
     /* Adding a restart button handling to the game. */
     vKeyboardControllerInit(tRun, &tRestartButton);
     vKeyboardOnPress(&tRestartButton, SDLK_r, fControllerHandler(vRestartBoard));
+
+    tContext2D tTextCtx = tContextInit();
+    tTextInit((struct tRuntime*)tRun, &tTxt, "Press R to restart", tTextCtx, "assets/FiraCode-Bold.ttf", 2);
 });
 
 FEATHER_LAYER(&GoL, 1, GameOfLifeUpdate,,{
     tRuntime *tRun = tThisRuntime();
-    vFeatherSleepThisLayerMs(tRun, 100)
+    vFeatherSleepThisLayerMs(tRun, 200)
         for (int i = 0; i < CANVAS_SIZE; ++i) 
             for (int j = 0; j < CANVAS_SIZE; ++j)
                 vGameOfLife(tRun, i, j);
