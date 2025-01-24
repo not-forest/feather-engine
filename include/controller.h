@@ -26,14 +26,13 @@
 
 #pragma once
 
-#include <SDL_keyboard.h>
 #ifndef FEATHER_CONTROLLER_H
 #define FEATHER_CONTROLLER_H
 
 #include <stdbool.h>
 #include <intrinsics.h>
+#include <context2d.h>
 #include <tllist.h>
-
 
 struct tController;
 typedef void (*fHandler)(void *tRun, struct tController *tCtrl);
@@ -72,21 +71,17 @@ typedef tll(fKeyboardPair) fKeyboardHandlerPairList;
 /* 
  *  @brief - convenient controller for handling keyboard input.
  *
- *  @tKeyboardController - holds an ID of this keyboard controller handler function.
- *
  *  Note that several functions can be hooked up to use for the same key. To rebind, previously created controllers
  *  must be cleaned up.
  * */
 typedef struct {
 
     struct {
-        uint32_t uDown;
-        uint32_t uUp;
+        uint32_t uDown, uUp;
     } tCtrlPair;
 
     struct {
-        fKeyboardHandlerPairList sdlPressed;
-        fKeyboardHandlerPairList sdlReleased;
+        fKeyboardHandlerPairList sdlPressed, sdlReleased;
     } tKeybHndPair;
 
 } tKeyboardController;
@@ -102,5 +97,31 @@ void __vKeyboardControllerHandlerFn(void *vRun, tController *tCtrl);
  *  @brief - returns true if the provided key was pressed at the time of function call.
  * */
 bool bFeatherIsKeyPressed(SDL_Scancode sdlKey);
+
+typedef struct { fHandler fHnd; uint8_t sdlButton; struct tRect *tRct; } fMouseKeyBunch; 
+typedef struct { fHandler fHnd; struct tRect *tRct; } fMouseBunch; 
+typedef tll(fMouseKeyBunch) fMouseKeyBunchList;
+typedef tll(fMouseBunch) fMouseBunchList;
+
+/* 
+ *  @brief - defines a mouse controller that allows to perform something based on things clicker, or hovered on.
+ *
+ *  Allows to perform different tasks, when mouse is clicked or hovered on something defined within the 2DContext
+ *  (usually rect).
+ * */
+typedef struct {
+
+    struct {
+        uint32_t uDown, uUp, uHover, uWheel;    
+    } tCtrlBunch;
+
+    struct {
+        fMouseKeyBunchList sdlPressed, sdlReleased;
+        fMouseBunchList sdlHover, sdlWheel;
+    } tMouseHndBunch;
+
+} tMouseController;
+
+void __vMouseControllerHandlerFn(void *vRun, tController *tCtrl);
 
 #endif

@@ -24,10 +24,11 @@
  *
  * */
 
-#include "log.h"
-#include "tllist.h"
+#include <log.h>
+#include <tllist.h>
 #include <SDL_keyboard.h>
 #include <SDL_keycode.h>
+#include <SDL_mouse.h>
 #include <SDL_scancode.h>
 #include <stdint.h>
 #include <controller.h>
@@ -143,4 +144,109 @@ void vKeyboardOnRelease(tKeyboardController* tKeyboardCtrl, SDL_Keycode sdlKey, 
 bool bFeatherIsKeyPressed(SDL_Scancode sdlKey) {
     const Uint8* uKeyState = SDL_GetKeyboardState(NULL);
     return uKeyState[sdlKey];
+}
+
+/* 
+ *  @brief - initializes a freshly clean mouse controller.
+ * */
+void vMouseControllerInit(tRuntime *tRun, tMouseController *tMouseCtrl) {
+    tController *tCtrlDown, *tCtrlUp, *tCtrlHover, *tCtrlWheel;
+
+    tMouseCtrl->tCtrlBunch.uDown = \ 
+        tControllerInit(tRun, SDL_MOUSEBUTTONDOWN, NULL, fControllerHandler(__vMouseControllerHandlerFn));
+    tMouseCtrl->tCtrlBunch.uUp = \ 
+        tControllerInit(tRun, SDL_MOUSEBUTTONUP, NULL, fControllerHandler(__vMouseControllerHandlerFn));
+    tMouseCtrl->tCtrlBunch.uHover = \ 
+        tControllerInit(tRun, SDL_MOUSEMOTION, NULL, fControllerHandler(__vMouseControllerHandlerFn));
+    tMouseCtrl->tCtrlBunch.uWheel = \ 
+        tControllerInit(tRun, SDL_MOUSEWHEEL, NULL, fControllerHandler(__vMouseControllerHandlerFn));
+
+    tMouseCtrl->tMouseHndBunch.sdlPressed = (fMouseKeyBunchList) tll_init();
+    tMouseCtrl->tMouseHndBunch.sdlReleased = (fMouseKeyBunchList) tll_init();
+    tMouseCtrl->tMouseHndBunch.sdlHover = (fMouseBunchList) tll_init();
+    tMouseCtrl->tMouseHndBunch.sdlWheel = (fMouseBunchList) tll_init();
+   
+    tCtrlDown = tControllerGet(tRun, tMouseCtrl->tCtrlBunch.uDown);
+    tCtrlUp = tControllerGet(tRun, tMouseCtrl->tCtrlBunch.uUp);
+    tCtrlHover = tControllerGet(tRun, tMouseCtrl->tCtrlBunch.uHover);
+    tCtrlWheel = tControllerGet(tRun, tMouseCtrl->tCtrlBunch.uWheel);
+    if (tCtrlDown == NULL || tCtrlUp == NULL)
+        vFeatherLogError("Inner controller not found. Unable to initialize");
+
+    tCtrlDown->vUserData = tMouseCtrl;
+    tCtrlUp->vUserData = tMouseCtrl;
+    tCtrlHover->vUserData = tMouseCtrl;
+    tCtrlWheel->vUserData = tMouseCtrl;
+}
+
+bool __vIfMouseInRect(int32_t mx, int32_t my, tRect *tRct) {
+    if (tRct == NULL)
+        return true;
+
+    return (mx >= tRct->tCtx.fX && mx <= tRct->tCtx.fX + tRct->tFr.uWidth && my >= tRct->tCtx.fY && my <= tRct->tCtx.fY + tRct->tFr.uHeight);
+}
+
+/* 
+ *  @brief - Handles mouse events based on the handler function provided to the mouse controller.
+ * */
+void __vMouseControllerHandlerFn(void *vRun, tController *tCtrl) {
+    tMouseController* tMouseCtrl = (tMouseController*)tCtrl->vUserData;
+    int32_t mx, my;
+    SDL_GetMouseState(&mx, &my);
+
+    switch (tCtrl->sdlEvent.type) {
+        case SDL_MOUSEBUTTONDOWN:
+            tll_foreach(tMouseCtrl->tMouseHndBunch.sdlPressed, tBunch)
+                if (tBunch->item.sdlButton == tCtrl->sdlEvent.button.button)
+                    if (__vIfMouseInRect(mx, my, (tRect*)tBunch->item.tRct))
+                        tBunch->item.fHnd(vRun, (struct tController*) tCtrl);
+            break;
+        case SDL_MOUSEBUTTONUP:
+            tll_foreach(tMouseCtrl->tMouseHndBunch.sdlReleased, tBunch)
+                if (tBunch->item.sdlButton == tCtrl->sdlEvent.button.button)
+                    if (__vIfMouseInRect(mx, my, (tRect*)tBunch->item.tRct))
+                        tBunch->item.fHnd(vRun, (struct tController*) tCtrl);
+            break;
+        case SDL_MOUSEMOTION:
+            tll_foreach(tMouseCtrl->tMouseHndBunch.sdlHover, tBunch) 
+                if (__vIfMouseInRect(mx, my, (tRect*)tBunch->item.tRct))
+                    tBunch->item.fHnd(vRun, (struct tController*) tCtrl);
+            break;
+        case SDL_MOUSEWHEEL:
+            tll_foreach(tMouseCtrl->tMouseHndBunch.sdlWheel, tBunch)
+                if (__vIfMouseInRect(mx, my, (tRect*)tBunch->item.tRct))
+                    tBunch->item.fHnd(vRun, (struct tController*) tCtrl);
+            break;
+        default:
+            break;
+    }
+}
+
+/* 
+ *  @brief - append handler function for the mouse controller on press event.  
+ * */
+void vMouseOnPress(tMouseController* tMouseCtrl, uint8_t sdlButton, tRect *tRct, fHandler fHnd) {
+    fMouseKeyBunch fPair = { .fHnd = fHnd, .sdlButton = sdlButton, .tRct = (struct tRect*)tRct };
+    tll_push_front(tMouseCtrl->tMouseHndBunch.sdlPressed, fPair);
+}
+/* 
+ *  @brief - append handler function for the mouse controller on release event.  
+ * */
+void vMouseOnRelease(tMouseController* tMouseCtrl, uint8_t sdlButton, tRect *tRct, fHandler fHnd) {
+    fMouseKeyBunch fPair = { .fHnd = fHnd, .sdlButton = sdlButton, .tRct = (struct tRect*)tRct };
+    tll_push_front(tMouseCtrl->tMouseHndBunch.sdlReleased, fPair);
+}
+/* 
+ *  @brief - append handler function for the mouse controller on hover event.  
+ * */
+void vMouseOnHover(tMouseController* tMouseCtrl, tRect *tRct, fHandler fHnd) {
+    fMouseBunch fPair = { .fHnd = fHnd, .tRct = (struct tRect*)tRct };
+    tll_push_front(tMouseCtrl->tMouseHndBunch.sdlHover, fPair);
+}
+/* 
+ *  @brief - append handler function for the mouse controller on mousewheel event.  
+ * */
+void vMouseOnWheel(tMouseController* tMouseCtrl, tRect *tRct, fHandler fHnd) {
+    fMouseBunch fPair = { .fHnd = fHnd, .tRct = (struct tRect*)tRct };
+    tll_push_front(tMouseCtrl->tMouseHndBunch.sdlWheel, fPair);
 }
