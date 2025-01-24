@@ -30,6 +30,7 @@
 #pragma once
 
 #include "audio.h"
+#include "context2d.h"
 #include "controller.h"
 #include <SDL_keycode.h>
 #ifndef FEATHER_RUNTIME_H
@@ -187,14 +188,6 @@ tEngineError errEngineInit(tRuntime *tRun) __attribute__((nonnull(1)));
 void vFeatherExit(tEngineError tStatus, tRuntime *tRun);
 
 /* 
- *  @brief - creates a new instance of Rect, while initializing the drawing context.
- *
- *  Acts as a constructor for Rect structure. Rects are owned by the runtime and can only be referenced.
- *  If some rect shall be shared between the layers, wrap it under a resource structure.
- * */
-tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTexturePath) __attribute__((nonnull(1)));
-
-/* 
  *  @brief - create a new controller.
  *
  *  @tRun           - currently running runtime.
@@ -228,6 +221,30 @@ void vKeyboardOnPress(tKeyboardController* tKeyboardCtrl, SDL_Keycode sdlKey, fH
 void vKeyboardOnRelease(tKeyboardController* tKeyboardCtrl, SDL_Keycode sdlKey, fHandler fHnd);
 
 /* 
+ *  @brief - initializes a freshly clean mouse controller.
+ * */
+void vMouseControllerInit(tRuntime *tRun, tMouseController *tMouseCtrl);
+
+/* 
+ *  @brief - append handler function for the mouse controller on press event.  
+ * */
+void vMouseOnPress(tMouseController* tMouseCtrl, uint8_t sdlButton, tRect *tRct, fHandler fHnd);
+/* 
+ *  @brief - append handler function for the mouse controller on release event.  
+ * */
+void vMouseOnRelease(tMouseController* tMouseCtrl, uint8_t sdlButton, tRect *tRct, fHandler fHnd);
+/* 
+ *  @brief - append handler function for the mouse controller on hover event.  
+ * */
+void vMouseOnHover(tMouseController* tMouseCtrl, tRect *tRct, fHandler fHnd);
+/* 
+ *  @brief - append handler function for the mouse controller on mousewheel event.  
+ * */
+void vMouseOnWheel(tMouseController* tMouseCtrl, tRect *tRct, fHandler fHnd);
+
+tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTexturePath);
+
+/* 
  *  @brief - draws the rectangle to the screen.
  *
  *  @tRun - currently running runtime.
@@ -245,6 +262,13 @@ void vDrawRect(tRuntime *tRun, tRect *rect) __attribute__((nonnull(1)));
  *  @sNewTexturePath - path to the new texture source.
  * */
 void vChangeRectTexture(tRuntime* tRun, tRect* tRct, char* sNewTexturePath) __attribute__((nonnull(1, 2)));
+
+/* 
+ *  Provides a proper pointer to the rect, based on it's ID.
+ *
+ *  This must be used to prevent pointer problems, when more rects are added.
+ * */
+tRect *tGetRect(tRuntime *tRun, uint32_t uRectId);
 
 /* 
  *  @brief - Animates the rect according to the currently chosen rect.

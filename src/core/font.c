@@ -24,11 +24,32 @@
  *
  * */
 
+#include <SDL_ttf.h>
 #include <log.h>
 #include <rect.h>
 #include <font.h>
 #include <runtime.h>
 #include <intrinsics.h>
+
+// Function to convert sString to char*
+char* sStringToCharPtr(const sString* sStr) {
+    if (!sStr) 
+        return NULL;
+
+    size_t length = tll_length(*sStr);
+    if (length == 0)
+        return strdup("");
+
+    char* result = (char*)malloc(length + 1);
+    if (!result)
+        return NULL;
+    size_t i = 0;
+    tll_foreach(*sStr, item)
+        result[i++] = *(char*)item;
+    result[length] = '\0';
+
+    return result;
+}
 
 /* 
  *  @brief - creates a new text unit.
@@ -40,7 +61,7 @@
  *  @sFontPath  - either relative or full path to the font file.
  *  @uPriority  - priority of rendering the text block.
  * */
-tText* tTextInit(struct tRuntime *tRun, tText *tTxt, const char *sInitText, tContext2D tCtx, const char *sFontPath, uint16_t uPriority) {
+tText* tTextInit(tRuntime *tRun, tText *tTxt, const char *sInitText, tContext2D tCtx, const char *sFontPath, uint16_t uPriority) {
     tRuntime *_tRun = (tRuntime*) tRun;
     TTF_Font *sdlFont = TTF_OpenFont(sFontPath, 24);
 
@@ -53,42 +74,95 @@ tText* tTextInit(struct tRuntime *tRun, tText *tTxt, const char *sInitText, tCon
         .tAnims = tll_init(), 
         .tCtx = tCtx, 
         .sTexturePath = "TEXTR",
-        .tFr.uIdx = 0 
+        .tFr.uIdx = 0,
+        .uRectId = uRectIDIncrementer,
     };
+
+    tTxt->uRectID = tRct.uRectId;
 
     if (!strlen(sInitText)) {
         vFeatherLogError("Zero length texts are not allowed.");
         return NULL;
     }
 
-    SDL_Surface* sdlSurf = TTF_RenderText_Solid(sdlFont, sInitText, __FEATHER__WHITE__);
-
-    if (sdlSurf == NULL) {
-        vFeatherLogError("Unable to create text surface: %s. %s", strrchr(sFontPath, '/') + 1, SDL_GetError());
-        return NULL;
-    }
-
-    if (__vRectFromTextureRaw(_tRun, &tRct, sdlSurf))
-        return NULL;
-
     // Insert the rectangle into the list with priority handling
     tll_foreach(_tRun->sScene->lRects, it) {
         if (it->item.uPriority > uPriority) {
             tll_insert_before(_tRun->sScene->lRects, it, tRct);
-            tRct = *(tRect*)it->prev;
         }
     }
 
     // New higher priority rectangles are pushed to the front
     tll_push_back(_tRun->sScene->lRects, tRct);
 
-    tTxt->tRct = (struct tRect*)_tRun->sScene->lRects.tail;
     tTxt->uFontSize = 24;
-    vTextAppend(tTxt, (char*)sInitText);
+    tTxt->sdlFont = sdlFont;
+    tTxt->sFontPath = sFontPath;
+    vTextAppend(tRun, tTxt, (char*)sInitText);
 
     return tTxt; 
 }
 
+/* 
+ *  @brief - allows to change the font and swap new text content.
+ * */
+void vChangeTextFont(tRuntime* tRun, tText* tTxt, const char* sNewFontPath, uint16_t uNewFontSize) {
+    tRect *tRct;
+    tRct = tGetRect(tRun, tTxt->uRectID);
+
+    if (tRct == NULL) {
+        vFeatherLogError("Unable to get text's Rect. Make sure that it is initialized.");
+        return;
+    }
+
+    if (sNewFontPath != NULL) {
+        // Unload the existing font
+        TTF_Font* oldFont = tTxt->sdlFont;
+        if (oldFont) {
+            TTF_CloseFont(oldFont);
+            tTxt->sdlFont = NULL; // Reset the font pointer
+        }
+
+        // Load the new font
+        TTF_Font* newFont = TTF_OpenFont(sNewFontPath, uNewFontSize);
+        if (!newFont) {
+            vFeatherLogError("Unable to load new font: %s", TTF_GetError());
+            return;
+        }
+
+        // Update the tText structure with the new font
+        tTxt->sdlFont = newFont;
+        tTxt->uFontSize = uNewFontSize;
+    }
+
+    // If there's an existing string, you may need to re-render it (optional)
+    SDL_Surface* sdlSurf = TTF_RenderUTF8(tTxt->sdlFont, sStringToCharPtr(&tTxt->sStr), __FEATHER__WHITE__, __FEATHER__BLACK__);
+    tRct->tFr.uWidth = sdlSurf->w; 
+    tRct->tFr.uHeight = sdlSurf->h;
+    if (!sdlSurf) {
+        vFeatherLogError("Unable to render text surface: %s", TTF_GetError());
+        TTF_CloseFont(tTxt->sdlFont); // Clean up on error
+        tTxt->sdlFont = NULL;
+        return;
+    }
+
+    SDL_Texture* textTexture = SDL_CreateTextureFromSurface(tRun->sdlRenderer, sdlSurf);
+    SDL_FreeSurface(sdlSurf);
+    if (!textTexture) {
+        vFeatherLogError("Unable to create text texture: %s", SDL_GetError());
+        TTF_CloseFont(tTxt->sdlFont);
+        tTxt->sdlFont = NULL;
+        return;
+    }
+
+    tRct->idTextureID = (uintptr_t)textTexture;
+}
+
+void __vInnerAppendCharUpdate(tRuntime *tRun, tText *tTxt, char cChar, bool bUpdate) {
+    tll_push_back(tTxt->sStr, cChar);
+    if (bUpdate)
+        vChangeTextFont(tRun, tTxt, NULL, tTxt->uFontSize);
+}
 
 /* 
  *  @brief - append one char to the currently written data within the text block.
@@ -96,8 +170,8 @@ tText* tTextInit(struct tRuntime *tRun, tText *tTxt, const char *sInitText, tCon
  *  @tTxt   - pointer to the text block to modify.
  *  @cChar  - char letter to append.
  * */
-void vTextAppendChar(tText *tTxt, char cChar) {
-    tll_push_front(tTxt->sStr, cChar);
+void vTextAppendChar(tRuntime *tRun, tText *tTxt, char cChar) {
+    __vInnerAppendCharUpdate(tRun, tTxt, cChar, true);
 }
 
 /* 
@@ -106,7 +180,7 @@ void vTextAppendChar(tText *tTxt, char cChar) {
  *  @tTxt   - pointer to the text block to modify.
  *  @sSlice - text slice to append.
  * */
-void vTextAppend(tText *tTxt, char *sSlice) {
+void vTextAppend(tRuntime *tRun, tText *tTxt, char *sSlice) {
     while (*sSlice)
-        vTextAppendChar(tTxt, *sSlice++);
+        __vInnerAppendCharUpdate(tRun, tTxt, *sSlice++, true);
 }

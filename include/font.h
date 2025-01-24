@@ -33,6 +33,9 @@
 #include <intrinsics.h>
 #include <context2d.h>
 
+typedef tll(char) sString;
+#include <rect.h>
+
 /* 
  *  @brief - generate a text block with the use of any TrueType font available on your system, by adding the
  *  font file (.ttf) to your project.
@@ -47,9 +50,13 @@
  * */
 typedef struct {
     uint16_t uFontSize;
-    struct tRect *tRct;
-    tll(char) sStr;
+    uint32_t uRectID;
+    TTF_Font *sdlFont;
+    const char *sFontPath;
+    sString sStr;
 } tText;
+
+#include <runtime.h>
 
 /* 
  *  @brief - creates a new text unit.
@@ -61,7 +68,7 @@ typedef struct {
  *  @sFontPath  - either relative or full path to the font file.
  *  @uPriority  - priority of rendering the text block.
  * */
-tText* tTextInit(struct tRuntime *tRun, tText *tTxt, const char *sInitText, tContext2D tCtx, const char *sFontPath, uint16_t uPriority);
+tText* tTextInit(tRuntime *tRun, tText *tTxt, const char *sInitText, tContext2D tCtx, const char *sFontPath, uint16_t uPriority);
 
 /* 
  *  @brief - append one char to the currently written data within the text block.
@@ -69,7 +76,7 @@ tText* tTextInit(struct tRuntime *tRun, tText *tTxt, const char *sInitText, tCon
  *  @tTxt   - pointer to the text block to modify.
  *  @cChar  - char letter to append.
  * */
-void vTextAppendChar(tText *tTxt, char cChar);
+void vTextAppendChar(tRuntime *tRun, tText *tTxt, char cChar);
 
 /* 
  *  @brief - append text slice to the currently written data within the text block.
@@ -77,6 +84,11 @@ void vTextAppendChar(tText *tTxt, char cChar);
  *  @tTxt   - pointer to the text block to modify.
  *  @sSlice - text slice to append.
  * */
-void vTextAppend(tText *tTxt, char *sSlice);
+void vTextAppend(tRuntime *tRun, tText *tTxt, char *sSlice);
+
+/* 
+ *  @brief - allows to change the font and swap new text content.
+ * */
+void vChangeTextFont(tRuntime* tRun, tText* tTxt, const char* sNewFontPath, uint16_t uNewFontSize);
 
 #endif

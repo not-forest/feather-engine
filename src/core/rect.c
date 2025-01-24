@@ -34,6 +34,10 @@
 #include <log.h>
 
 int __vRectFromTextureRaw(tRuntime *tRun, tRect *tRct, SDL_Surface *sdlSurf) {
+    if (tRct == NULL) {
+        vFeatherLogError("Internal error. NULL Rect in __vRectFromTextureRaw function.");
+    }
+
     tRct->tFr.uWidth = sdlSurf->w; 
     tRct->tFr.uHeight = sdlSurf->h;
 
@@ -58,7 +62,8 @@ tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTex
         .tCtx = tCtx, 
         .sTexturePath = sTexturePath, 
         .uPriority = uPriority, 
-        .tFr.uIdx = 0 
+        .tFr.uIdx = 0,
+        .uRectId = uRectIDIncrementer++,
     };
 
     if (sTexturePath == NULL) {
@@ -80,12 +85,11 @@ tRect* tInitRect(tRuntime *tRun, tContext2D tCtx, uint16_t uPriority, char* sTex
     }
 
     // Insert the rectangle into the list with priority handling
-    tll_foreach(tRun->sScene->lRects, it) {
+    tll_foreach(tRun->sScene->lRects, it)
         if (it->item.uPriority > uPriority) {
             tll_insert_before(tRun->sScene->lRects, it, tRct);
             return (tRect*)it->prev;
         }
-    }
 
     // New higher priority rectangles are pushed to the front
     tll_push_back(tRun->sScene->lRects, tRct);
@@ -309,4 +313,18 @@ void vFullScreenRectWidth(tRect *tRct, tRuntime *tRun) {
  * */
 void vFullScreenRectHeight(tRect *tRct, tRuntime *tRun) {
     __vFullscreenInner(tRct, tRun, false, true);
+}
+
+/* 
+ *  Provides a proper pointer to the rect, based on it's ID.
+ *
+ *  This must be used to prevent pointer problems, when more rects are added.
+ * */
+tRect *tGetRect(tRuntime *tRun, uint32_t uRectId) {
+    tRect *tRctPtr = NULL;
+    tll_foreach(tRun->sScene->lRects, tRct)
+        if (tRct->item.uRectId == uRectId)
+            tRctPtr = &tRct->item;
+
+    return tRctPtr;
 }

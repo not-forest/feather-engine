@@ -75,8 +75,11 @@ typedef struct {
     tFrame tFr;
 
     uint16_t uAnimationId;
+    uint32_t uRectId;
     tll(tAnimation) tAnims;
 } tRect;
+
+static uint32_t uRectIDIncrementer = 0;
 
 /* 
  *  @brief - List of drawable rectangles.
