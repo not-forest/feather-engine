@@ -50,8 +50,10 @@ typedef tll(char) sString;
  * */
 typedef struct {
     uint16_t uFontSize;
+    uint16_t uLength;
     uint32_t uRectID;
     TTF_Font *sdlFont;
+
     const char *sFontPath;
     sString sStr;
 } tText;
@@ -77,6 +79,18 @@ tText* tTextInit(tRuntime *tRun, tText *tTxt, const char *sInitText, tContext2D 
  *  @cChar  - char letter to append.
  * */
 void vTextAppendChar(tRuntime *tRun, tText *tTxt, char cChar);
+
+/* 
+ *  @brief - pops one char from the internal string.
+ *
+ *  Will always return '\0' when the string is empty.
+ * */
+char vTextPopChar(tRuntime *tRun, tText *tTxt);
+
+/* 
+ *  @brief - clears the whole text.
+ * */
+char* sTextClear(tRuntime *tRun, tText *tTxt);
 
 /* 
  *  @brief - append text slice to the currently written data within the text block.

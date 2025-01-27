@@ -67,7 +67,7 @@ FEATHER_LAYER(&GoL, iPerformNTimes(1), InitGameCanvas,
     vKeyboardOnPress(&tRestartButton, SDLK_r, fControllerHandler(vRestartBoard));
 
     tContext2D tTextCtx = tContextInit();
-    tTextInit((struct tRuntime*)tRun, &tTxt, "Press R to restart", tTextCtx, "assets/FiraCode-Bold.ttf", 2);
+    tTextInit(tRun, &tTxt, "Press R to restart", tTextCtx, "assets/FiraCode-Bold.ttf", 2);
 });
 
 FEATHER_LAYER(&GoL, 1, GameOfLifeUpdate,,{

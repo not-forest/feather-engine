@@ -24,6 +24,7 @@
  *
  * */
 
+#include "tllist.h"
 #include <SDL_ttf.h>
 #include <log.h>
 #include <rect.h>
@@ -73,7 +74,7 @@ tText* tTextInit(tRuntime *tRun, tText *tTxt, const char *sInitText, tContext2D 
     tRect tRct = { 
         .tAnims = tll_init(), 
         .tCtx = tCtx, 
-        .sTexturePath = "TEXTR",
+        .sTexturePath = "TTEXT",
         .tFr.uIdx = 0,
         .uRectId = uRectIDIncrementer,
     };
@@ -96,6 +97,7 @@ tText* tTextInit(tRuntime *tRun, tText *tTxt, const char *sInitText, tContext2D 
     tll_push_back(_tRun->sScene->lRects, tRct);
 
     tTxt->uFontSize = 24;
+    tTxt->uLength = 0;
     tTxt->sdlFont = sdlFont;
     tTxt->sFontPath = sFontPath;
     vTextAppend(tRun, tTxt, (char*)sInitText);
@@ -115,27 +117,24 @@ void vChangeTextFont(tRuntime* tRun, tText* tTxt, const char* sNewFontPath, uint
         return;
     }
 
-    if (sNewFontPath != NULL) {
-        // Unload the existing font
+    if (sNewFontPath != NULL || tTxt->uFontSize != uNewFontSize) {
         TTF_Font* oldFont = tTxt->sdlFont;
         if (oldFont) {
             TTF_CloseFont(oldFont);
-            tTxt->sdlFont = NULL; // Reset the font pointer
+            tTxt->sdlFont = NULL;
         }
 
-        // Load the new font
+        sNewFontPath = (sNewFontPath == NULL) ? tTxt->sFontPath : sNewFontPath;
         TTF_Font* newFont = TTF_OpenFont(sNewFontPath, uNewFontSize);
         if (!newFont) {
             vFeatherLogError("Unable to load new font: %s", TTF_GetError());
             return;
         }
 
-        // Update the tText structure with the new font
         tTxt->sdlFont = newFont;
         tTxt->uFontSize = uNewFontSize;
     }
 
-    // If there's an existing string, you may need to re-render it (optional)
     SDL_Surface* sdlSurf = TTF_RenderUTF8(tTxt->sdlFont, sStringToCharPtr(&tTxt->sStr), __FEATHER__WHITE__, __FEATHER__BLACK__);
     tRct->tFr.uWidth = sdlSurf->w; 
     tRct->tFr.uHeight = sdlSurf->h;
@@ -159,9 +158,41 @@ void vChangeTextFont(tRuntime* tRun, tText* tTxt, const char* sNewFontPath, uint
 }
 
 void __vInnerAppendCharUpdate(tRuntime *tRun, tText *tTxt, char cChar, bool bUpdate) {
-    tll_push_back(tTxt->sStr, cChar);
+    if (cChar != '\0' && cChar != '\n') {
+        tll_push_back(tTxt->sStr, cChar);
+        tTxt->uLength++;
+        if (bUpdate)
+            vChangeTextFont(tRun, tTxt, NULL, tTxt->uFontSize);
+    }
+}
+
+char __vInnerPopCharUpdate(tRuntime *tRun, tText *tTxt, bool bUpdate) {
+    char c = '\0';
+    if (tll_length(tTxt->sStr) - 1) {
+        c = tll_pop_back(tTxt->sStr);
+        tTxt->uLength--;
+    }
     if (bUpdate)
         vChangeTextFont(tRun, tTxt, NULL, tTxt->uFontSize);
+    return c;
+}
+
+/* 
+ *  @brief - pops one char from the internal string.
+ *
+ *  Will always return '\0' when the string is empty.
+ * */
+char vTextPopChar(tRuntime *tRun, tText *tTxt) {
+    return __vInnerPopCharUpdate(tRun, tTxt, true);
+}
+
+/* 
+ *  @brief - clears the whole text.
+ * */
+char* sTextClear(tRuntime *tRun, tText *tTxt) {
+    char* sStr = sStringToCharPtr(&tTxt->sStr); 
+    while (vTextPopChar(tRun, tTxt) != '\0');
+    return sStr;
 }
 
 /* 
@@ -181,6 +212,8 @@ void vTextAppendChar(tRuntime *tRun, tText *tTxt, char cChar) {
  *  @sSlice - text slice to append.
  * */
 void vTextAppend(tRuntime *tRun, tText *tTxt, char *sSlice) {
-    while (*sSlice)
-        __vInnerAppendCharUpdate(tRun, tTxt, *sSlice++, true);
+    while (*(sSlice+1))
+        __vInnerAppendCharUpdate(tRun, tTxt, *sSlice++, false);
+    if (*sSlice)
+        __vInnerAppendCharUpdate(tRun, tTxt, *sSlice, true);
 }
