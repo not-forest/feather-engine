@@ -24,6 +24,7 @@
 
 #pragma once
 
+#include "scene.h"
 #ifndef FEATHER_PHYSICS_H
 #define FEATHER_PHYSICS_H
 
@@ -92,20 +93,17 @@ typedef enum {
  *  @tRct               - pointer to the rect entity, which will be affected by physics.
  *  @eBodyType          - physical type of this body. This defines a lot about the behavior of this entity
  *  @uCollidersGroup    - group in which this entity appears. Only entitties within the same group collide.
- *  @tMForce            - main force applied to the entity, when the body type is DYNAMIC.
- *  @tGForce            - Gravity force applied to the object. It can be a zero force to prevent gravity at all.
  *  @tAdditionalForces  - additional forces supplied by user.
  *  @uDelay             - delay in milliseconds, which prevents this controller from spamming too much.
  *
  * */
 typedef struct {
-    uint32_t uCtrlId;
+    uint32_t uCtrlId, uDelay, uCollidersGroup;
     tRect *tRct;
     ePhysicalBodyType eBodyType;
     eGravityDirection eGravityDir;
-    uint32_t uCollidersGroup;
     tForcesList tAdditionalForces;
-    uint32_t uDelay;
+    tColliders lCurrentlyCollides;
 } tPhysController;
 
 void __vPhysicsControllerInternal(void *vRun, tController *tCtrl);
@@ -141,5 +139,10 @@ void vPhysicsSetDelay(tRuntime *tRun, tPhysController *tPhys, double dDelay) __a
  *  The force is applied once, and removed after the first controller update.
  * */
 void vPhysicsApplyForce(tPhysController *tPhys, tForce tF) __attribute__((nonnull(1)));
+
+/* 
+ *  @brief - returns true of something collides with a collider.
+ * */
+bool bPhysicsCurrentlyCollides(tPhysController *tPhys);
 
 #endif
