@@ -28,10 +28,25 @@
 #ifndef FEATHER_SCENE_H
 #define FEATHER_SCENE_H
 
+#include <tllist.h>
+#include <stdint.h>
+
+/* 
+ *  @brief - additional structure that provides a way to observe colliders.
+ *
+ *  Only four parameters is required.
+ * */
+typedef struct {
+    double x, y, w, h;
+    uint32_t uColliderId, uCollidersGroup;
+} tColliderLabel;
+
+typedef tll(tColliderLabel) tColliders;
+
 #include <controller.h>
 #include <layer.h>
-#include <tllist.h>
 #include <rect.h>
+
 
 /* 
  *  @brief - defines a structure of one generic scene.
@@ -47,6 +62,7 @@ typedef struct {
     tLayerList lLayers;
     tControllerList lControllers;
     tRectList lRects;
+    tColliders lColliders;
 
     uint32_t uCurrentRunningLayerId;
     uint32_t uCurrentRunningControllerId;
@@ -85,6 +101,7 @@ void vSceneRemoveController(tScene *sScene, uint32_t uControllerID) __attribute_
         .lLayers = tll_init(),          \
         .lControllers = tll_init(),     \
         .lRects = tll_init(),           \
+        .lColliders = tll_init(),       \
         .uCurrentRunningLayerId = 0,    \
         .uCurrentRunningControllerId = 0\
     };                                  \
