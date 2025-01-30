@@ -39,7 +39,7 @@ FEATHER_SCENE(Start);
 
 void cfg(tRuntime *tRun) {
     tRun->sScene = &Menu;
-    tRun->cMainWindowName = "Game: (Menu)";
+    tRun->cMainWindowName = "Menu Example";
 }
 
 tMouseController tMCtrl;
@@ -104,33 +104,33 @@ void vGoBack(void *vRun, tController *tRun) {
 
 /* Other scenes are defines just to show how you can go back and fourth between them. */
 FEATHER_LAYER(&Start, iPerformNTimes(1), InitializeMainApp,
-    tText tGoBackText;
+    tText tGoBackTextM;
 ,{
     tRuntime *tRun = tThisRuntime();
     tContext2D tCtx = tContextInit();
     tRect *tBg = tInitRect(tRun, tCtx, 0, "assets/SomeMainApp.jpg");
     vFullScreenRect(tBg, tRun);
 
-    tTextInit(tRun, &tGoBackText, "Go Back To Main Menu", tCtx, "assets/FiraCode-Bold.ttf", 1);
+    tTextInit(tRun, &tGoBackTextM, "Go Back To Main Menu", tCtx, "assets/FiraCode-Bold.ttf", 1);
 
     vMouseControllerInit(tRun, &tGoBackCtrl);
-    tRect *tTextRect = tGetRect(tRun, tGoBackText.uRectID);
+    tRect *tTextRect = tGetRect(tRun, tGoBackTextM.uRectID);
 
     vMouseOnPress(&tGoBackCtrl, 1, tTextRect, fControllerHandler(vGoBack));
 });
 
 FEATHER_LAYER(&Settings, iPerformNTimes(1), InitializeSettings,
-    tText tGoBackText;
+    tText tGoBackTextS;
 ,{
     tRuntime *tRun = tThisRuntime();
     tContext2D tCtx = tContextInit();
     tRect *tBg = tInitRect(tRun, tCtx, 0, "assets/SettingsBackground.jpg");
     vFullScreenRect(tBg, tRun);
 
-    tTextInit(tRun, &tGoBackText, "Go Back To Main Menu", tCtx, "assets/FiraCode-Bold.ttf", 1);
+    tTextInit(tRun, &tGoBackTextS, "Go Back To Main Menu", tCtx, "assets/FiraCode-Bold.ttf", 1);
 
     vMouseControllerInit(tRun, &tGoBackCtrl);
-    tRect *tTextRect = tGetRect(tRun, tGoBackText.uRectID);
+    tRect *tTextRect = tGetRect(tRun, tGoBackTextS.uRectID);
 
     vMouseOnPress(&tGoBackCtrl, 1, tTextRect, fControllerHandler(vGoBack));
 });
