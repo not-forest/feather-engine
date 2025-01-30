@@ -22,12 +22,9 @@
  *
  * */
 
-#include <context2d.h>
 #include <feather.h>
-#include <layer.h>
 #include <physics.h>
-#include <rect.h>
-#include <runtime.h>
+#include <time.h>
 
 FEATHER_SCENE(BirdGame);
 
@@ -39,6 +36,10 @@ void cfg(tRuntime *tRun) {
 RUNTIME_CONFIGURE(cfg)
 
 static double dBackgroundOffset = 0;
+static struct {
+    tRect *uTopTubeRects[3], *uBottomTubeRects[3];
+    int uTubeOffsetVals[3];
+} Tubes = { .uTubeOffsetVals = {1000, 1500, 2000} };
 
 FEATHER_LAYER(&BirdGame, iPerformNTimes(1), GameInitialize,
     void vFullScreen(void*,tController*);
@@ -71,16 +72,19 @@ FEATHER_LAYER(&BirdGame, iPerformNTimes(1), GameInitialize,
     vKeyboardOnPress(&Bird.tKeybCtrl, SDLK_SPACE, fControllerHandler(vFly));
 
     // Adding dynamic physics to the bird. This will cause bird to fall.
-    Bird.tBirdPhysics.tGForce.dAccel = 5;
-    Bird.tBirdPhysics.tGForce.dMaxSpeed = 10;
     vPhysicsInit(tRun, &Bird.tBirdPhysics, Bird.tRect, DYNAMIC, 0);
-    vPhysicsSetDelay(tRun, &Bird.tBirdPhysics, 15);
+    vPhysicsSetDelay(tRun, &Bird.tBirdPhysics, 5);
+
+    tForce tGForce = { .x = 0, .y = 1, .dSpeed = 5, .iTimes = -1 };
+    vPhysicsApplyForce(&Bird.tBirdPhysics, tGForce);
 });
 
 /* Importing animation. */
 FEATHER_LAYER(&BirdGame, iPerformNTimes(1), GameAnimationsInitialize,
 #define BIRD_FLIGHT_ANIMATION (uint8_t[]){0, 1, 2, 3}
 ,{
+    srand(time(NULL));
+
     for (int i = 0; i < 8; ++i) // Eight same animations with different bird colors.
         vRectAppendAnimation(Bird.tRect, BIRD_FLIGHT_ANIMATION, 4);
 });
@@ -88,7 +92,7 @@ FEATHER_LAYER(&BirdGame, iPerformNTimes(1), GameAnimationsInitialize,
 /* Updates the animation */
 FEATHER_LAYER(&BirdGame, 1, GameUpdate,, {
     tRuntime* tRun = tThisRuntime();
-    vAnimateFrame(tRun, Bird.tRect, 0, 500);
+    vAnimateFrame(tRun, Bird.tRect, 0, 100);
 });
 
 /* Adjusts the size of the rects according to the proporsion of the screen. */
@@ -110,8 +114,64 @@ void vFullScreen(void *vRun, tController *tCtrl) {
     }
 }
 
+/* Spawns three set of tubes, for moving. */
+FEATHER_LAYER(&BirdGame, iPerformNTimes(1), SpawnTubes,,{
+    tRuntime* tRun = tThisRuntime();
+    tContext2D tTubeCtx = tContextInit();
+
+    for (int i = 0; i < 3; ++i) {
+        tTubeCtx.fX = Tubes.uTubeOffsetVals[i];
+        tTubeCtx.fY = rand() % 500 - 700;
+        tRect *tRctTop = tInitRect(tRun, tTubeCtx, 1, "assets/flappy_tubes.png");
+        vFullScreenRectHeight(tRctTop, tRun);
+        vRectIndexate(tRctTop, 0, 89, 526);
+
+        tTubeCtx.fY += tRctTop->tFr.uHeight + 100;
+        tRect *tRctBottom = tInitRect(tRun, tTubeCtx, 1, "assets/flappy_tubes.png");
+        vFullScreenRectHeight(tRctBottom, tRun);
+        vRectIndexate(tRctBottom, 1, 89, 526);
+
+        Tubes.uTopTubeRects[i] = tRctTop;
+        Tubes.uBottomTubeRects[i] = tRctBottom;
+    }
+});
+
+FEATHER_LAYER(&BirdGame, 1, MoveTubes,, {
+    tRuntime* tRun = tThisRuntime();
+    vFeatherSleepThisLayerMs(tRun, 10) {
+        for (int i = 0; i < 3; ++i) {
+            int x = Tubes.uTubeOffsetVals[i] -= 10;
+            Tubes.uTopTubeRects[i]->tCtx.fX = x;
+            Tubes.uBottomTubeRects[i]->tCtx.fX = x;
+
+            if (x <- 300) {
+                uint32_t uTubeHeight = Tubes.uTopTubeRects[i]->tFr.uHeight;
+                Tubes.uTubeOffsetVals[i] = 1000;
+                Tubes.uTopTubeRects[i]->tCtx.fY = rand() % uTubeHeight/2. - uTubeHeight;
+                Tubes.uBottomTubeRects[i]->tCtx.fY = 
+                    Tubes.uTopTubeRects[i]->tCtx.fY + uTubeHeight + rand() % 100 + 50;
+            }
+        }
+    }
+});
+
+FEATHER_LAYER(&BirdGame, 1, MoveBackground,,{
+    tRuntime* tRun = tThisRuntime();
+    vFeatherSleepThisLayerMs(tRun, 10) {
+        dBackgroundOffset -= 5;
+        for (int i = 0; i < 3; ++i) {
+            tContext2D *tBgCtx = &tRctBg[i]->tCtx;
+            tBgCtx->fX = tRctBg[i]->tFr.uWidth * tBgCtx->fScaleX * i + dBackgroundOffset; 
+        }
+        if (dBackgroundOffset < -465)
+            dBackgroundOffset = 0;
+    }
+})
+
 /* Handling space event. */
 void vFly(void *vRun, tController *tCtrl) {
-    tForce tF = { .x = 0, .y = -1, .dSpeed = 10 };
-    vPhysicsApplyForce(&Bird.tBirdPhysics, tF);
+    tForce tF1 = { .x = 0, .y = -1, .iTimes = 20, .dSpeed = 10 };
+    tForce tF2 = { .x = 0, .y = -1, .iTimes = 10, .dSpeed = 5 };
+    vPhysicsApplyForce(&Bird.tBirdPhysics, tF1);
+    vPhysicsApplyForce(&Bird.tBirdPhysics, tF2);
 }
