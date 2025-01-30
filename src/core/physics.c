@@ -23,6 +23,7 @@
  * */
 
 #include "runtime.h"
+#include "scene.h"
 #include "tllist.h"
 #include <SDL_events.h>
 #include <feather.h>
@@ -40,18 +41,31 @@
  * */
 void vPhysicsInit(tRuntime *tRun, tPhysController *tPhys, tRect *tRct, ePhysicalBodyType eBodyType, uint32_t uCollidersGroup) {
     tController *tCtrl;
+
     *tPhys = (tPhysController){
         .tRct = tRct,
         .eBodyType = eBodyType,
         .eGravityDir = BOTTOM,
         // Initial state of object is unchanged. Can be manually manipulated within the user space.
         .tAdditionalForces = tll_init(),
-        .uCollidersGroup = uCollidersGroup
+        .lCurrentlyCollides = tll_init(),
+        .uCollidersGroup = uCollidersGroup,
     };
 
     tPhys->uCtrlId = tControllerInit(tRun, SDL_USEREVENT, tPhys, fControllerHandler(__vPhysicsControllerInternal));
     tCtrl = tControllerGet(tRun, tPhys->uCtrlId);
     tCtrl->invoke = true; // Physics controllers always invoke themselves.
+
+    tColliderLabel tClbl = { 
+        .x = tRct->tCtx.fX, 
+        .y = tRct->tCtx.fY,
+        .uCollidersGroup = uCollidersGroup,
+        .w = tRct->tCtx.fScaleX * tRct->tFr.uWidth,
+        .h = tRct->tCtx.fScaleY * tRct->tFr.uHeight,
+        .uColliderId = tPhys->uCtrlId,
+    };
+    vFeatherLogInfo("Appending new collider for the current scene: %d", tClbl.uColliderId);
+    tll_push_front(tRun->sScene->lColliders, tClbl);
 }
 
 /* 
@@ -68,10 +82,32 @@ void vPhysicsSetDelay(tRuntime *tRun, tPhysController *tPhys, double dDelay) {
     tCtrl->uDelay = dDelay;
 }
 
+int checkCollision(tColliderLabel a, tColliderLabel b) {
+    vFeatherLogInfo("%f, %f, %f, %f", a.x, b.x, a.y, b.y);
+    return !(a.x + a.w <= b.x ||  // A is completely to the left of B
+             a.x >= b.x + b.w ||  // A is completely to the right of B
+             a.y + a.h <= b.y ||  // A is completely above B
+             a.y >= b.y + b.h);   // A is completely below B
+}
+
+
 void __vPhysicsControllerInternal(void *vRun, tController *tCtrl) {
     tCtrl->invoke = true; // self invoked.
+    tRuntime *tRun = (tRuntime*)vRun;
     tPhysController *tPhys = (tPhysController*)tCtrl->vUserData;
     tRect *tRct = tPhys->tRct;
+
+    tColliderLabel tCol;
+    tll_foreach(tRun->sScene->lColliders, tData) {
+        tCol = tData->item;
+        if (tData->item.uColliderId == tPhys->uCtrlId) {
+            tData->item.x = tPhys->tRct->tCtx.fX;
+            tData->item.y = tPhys->tRct->tCtx.fY;
+            tData->item.w = tPhys->tRct->tCtx.fScaleX * tPhys->tRct->tFr.uWidth;
+            tData->item.h = tPhys->tRct->tCtx.fScaleY * tPhys->tRct->tFr.uHeight;
+            break;
+        }
+    }
 
     switch (tPhys->eBodyType) {
         case DYNAMIC:
@@ -84,13 +120,18 @@ void __vPhysicsControllerInternal(void *vRun, tController *tCtrl) {
                     tF->item.iTimes--;
             }
 
-            break;
         case STATIC:
-            break;
+            tll_foreach(tRun->sScene->lColliders, tData) {
+                tColliderLabel tCol2 = tData->item;
+                if (tCol2.uCollidersGroup == tPhys->uCollidersGroup) {
+                    if (tCol2.uColliderId != tCol.uColliderId && checkCollision(tCol, tCol2)) {
+                        tll_push_front(tPhys->lCurrentlyCollides, tCol2);
+                    }
+                }
+            }
         case COLLIDER:
             break;
     }
-        
 }
 
 /* 
@@ -135,3 +176,9 @@ void vAppendForce(tForce *tMainForce, tForce *tForwardedForce) {
     vFeatherLogInfo("%f", tMainForce->dSpeed);
 }
 
+/* 
+ *  @brief - returns true of something collides with a collider.
+ * */
+bool bPhysicsCurrentlyCollides(tPhysController *tPhys) {
+    return tll_length(tPhys->lCurrentlyCollides) > 0;
+}
