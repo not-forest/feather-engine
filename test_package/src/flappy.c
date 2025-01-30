@@ -22,8 +22,11 @@
  *
  * */
 
+#include <context2d.h>
 #include <feather.h>
+#include <layer.h>
 #include <physics.h>
+#include <runtime.h>
 #include <time.h>
 
 FEATHER_SCENE(BirdGame);
@@ -115,24 +118,31 @@ void vFullScreen(void *vRun, tController *tCtrl) {
 }
 
 /* Spawns three set of tubes, for moving. */
-FEATHER_LAYER(&BirdGame, iPerformNTimes(1), SpawnTubes,,{
+FEATHER_LAYER(&BirdGame, iPerformNTimes(1), SpawnTubes,
+    tPhysController tTubePhys[6];
+,{
     tRuntime* tRun = tThisRuntime();
     tContext2D tTubeCtx = tContextInit();
 
     for (int i = 0; i < 3; ++i) {
         tTubeCtx.fX = Tubes.uTubeOffsetVals[i];
-        tTubeCtx.fY = rand() % 500 - 700;
+        tTubeCtx.fY = rand() % 500 - 650;
         tRect *tRctTop = tInitRect(tRun, tTubeCtx, 1, "assets/flappy_tubes.png");
         vFullScreenRectHeight(tRctTop, tRun);
         vRectIndexate(tRctTop, 0, 89, 526);
 
-        tTubeCtx.fY += tRctTop->tFr.uHeight + 100;
+        tTubeCtx.fY += tRctTop->tFr.uHeight + 200;
         tRect *tRctBottom = tInitRect(tRun, tTubeCtx, 1, "assets/flappy_tubes.png");
         vFullScreenRectHeight(tRctBottom, tRun);
         vRectIndexate(tRctBottom, 1, 89, 526);
 
         Tubes.uTopTubeRects[i] = tRctTop;
         Tubes.uBottomTubeRects[i] = tRctBottom;
+
+        vPhysicsInit(tRun, &tTubePhys[i], Tubes.uTopTubeRects[i], STATIC, 0); 
+        vPhysicsInit(tRun, &tTubePhys[5 - i], Tubes.uBottomTubeRects[i], STATIC, 0); 
+        vPhysicsSetDelay(tRun, &tTubePhys[i], 20);
+        vPhysicsSetDelay(tRun, &tTubePhys[5 - i], 20);
     }
 });
 
@@ -149,8 +159,18 @@ FEATHER_LAYER(&BirdGame, 1, MoveTubes,, {
                 Tubes.uTubeOffsetVals[i] = 1000;
                 Tubes.uTopTubeRects[i]->tCtx.fY = rand() % uTubeHeight/2. - uTubeHeight;
                 Tubes.uBottomTubeRects[i]->tCtx.fY = 
-                    Tubes.uTopTubeRects[i]->tCtx.fY + uTubeHeight + rand() % 100 + 50;
+                    Tubes.uTopTubeRects[i]->tCtx.fY + uTubeHeight + rand() % 300 + 100;
             }
+        }
+
+        if (bPhysicsCurrentlyCollides(&Bird.tBirdPhysics)) {
+            tContext2D tCtx = tContextInit();
+            tRect *tGameOver = tInitRect(tRun, tCtx, 1, "assets/flappy_gameover.png");
+
+            tForce tGOForce = { .x = -1, .y = 2, .iTimes = -1, .dSpeed = 5 };
+            vPhysicsApplyForce(&Bird.tBirdPhysics, tGOForce);
+            vContextRotate(&Bird.tRect->tCtx, 1);
+            vFullScreenRect(tGameOver, tRun);
         }
     }
 });

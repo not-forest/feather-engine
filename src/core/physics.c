@@ -83,7 +83,6 @@ void vPhysicsSetDelay(tRuntime *tRun, tPhysController *tPhys, double dDelay) {
 }
 
 int checkCollision(tColliderLabel a, tColliderLabel b) {
-    vFeatherLogInfo("%f, %f, %f, %f", a.x, b.x, a.y, b.y);
     return !(a.x + a.w <= b.x ||  // A is completely to the left of B
              a.x >= b.x + b.w ||  // A is completely to the right of B
              a.y + a.h <= b.y ||  // A is completely above B
