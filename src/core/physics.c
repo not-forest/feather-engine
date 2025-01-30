@@ -26,6 +26,7 @@
 #include "tllist.h"
 #include <SDL_events.h>
 #include <feather.h>
+#include <math.h>
 #include <physics.h>
 
 /* 
@@ -43,7 +44,7 @@ void vPhysicsInit(tRuntime *tRun, tPhysController *tPhys, tRect *tRct, ePhysical
         .tRct = tRct,
         .eBodyType = eBodyType,
         .eGravityDir = BOTTOM,
-        .tGForce = { .x = 0, .y = 1, .dMaxSpeed = 1, .dSpeed = 0.0001, .dAccel = 9.8 },
+        // Initial state of object is unchanged. Can be manually manipulated within the user space.
         .tAdditionalForces = tll_init(),
         .uCollidersGroup = uCollidersGroup
     };
@@ -74,16 +75,15 @@ void __vPhysicsControllerInternal(void *vRun, tController *tCtrl) {
 
     switch (tPhys->eBodyType) {
         case DYNAMIC:
-            // Updating the gravitational force each controller tick.
-            vUpdateForce(&tPhys->tGForce);
-
             // Each additional supplied force is applied to the rect and removed.
             tll_foreach(tPhys->tAdditionalForces, tF) {
-                vAppendForce(&tPhys->tGForce, &tF->item);
-                tll_remove(tPhys->tAdditionalForces, tF);
+                vApplyForce(tRct, &tF->item);
+                if (tF->item.iTimes == 0)
+                    tll_remove(tPhys->tAdditionalForces, tF);
+                else if (tF->item.iTimes > 0)
+                    tF->item.iTimes--;
             }
 
-            vApplyForce(tRct, &tPhys->tGForce);
             break;
         case STATIC:
             break;
@@ -106,16 +106,6 @@ void vPhysicsApplyForce(tPhysController *tPhys, tForce tF) {
 }
 
 /* 
- *  @brief - updates force's bias based on current velocity and speed.
- *
- *  @tFc - pointer to the force, which shall be upgraded (for example once per game tick.)
- * */
-void vUpdateForce(tForce *tFc) {
-    if (tFc->dSpeed < tFc->dMaxSpeed)
-        tFc->dSpeed *= tFc->dAccel;
-}
-
-/* 
  *  @brief - applies the force to the provided rect.
  * */
 void vApplyForce(tRect *tRct, tForce *tFc) {
@@ -133,14 +123,15 @@ void vApplyForce(tRect *tRct, tForce *tFc) {
  * */
 
 void vAppendForce(tForce *tMainForce, tForce *tForwardedForce) {
-    tMainForce->x += tForwardedForce->x;
-    tMainForce->y += tForwardedForce->y;
+    double dDotProd = tMainForce->x * tForwardedForce->x + tMainForce->y * tForwardedForce->y;
 
-    tMainForce->dSpeed += tForwardedForce->dSpeed;
-    tMainForce->dAccel += tForwardedForce->dAccel;
+    tMainForce->dSpeed = sqrt(pow(tMainForce->dSpeed, 2) + 
+                              pow(tForwardedForce->dSpeed, 2) + 
+                              2 * tMainForce->dSpeed * tForwardedForce->dSpeed * dDotProd);
 
-    if (tMainForce->dSpeed > tMainForce->dMaxSpeed) {
+    if (tMainForce->dSpeed > tMainForce->dMaxSpeed)
         tMainForce->dSpeed = tMainForce->dMaxSpeed;
-    }
+
+    vFeatherLogInfo("%f", tMainForce->dSpeed);
 }
 

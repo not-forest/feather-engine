@@ -27,6 +27,7 @@
 #ifndef FEATHER_PHYSICS_H
 #define FEATHER_PHYSICS_H
 
+#include <stdint.h>
 #include <tllist.h>
 
 /* 
@@ -39,7 +40,8 @@
  *  @dMaxSpeed  - maximal speed, which cannot be surpassed.
  * */
 typedef struct {
-    double x, y, dSpeed, dAccel, dMaxSpeed;
+    double x, y, dSpeed, dMaxSpeed;
+    int32_t iTimes;
 } tForce;
 
 typedef tll(tForce) tForcesList;
@@ -48,13 +50,6 @@ typedef tll(tForce) tForcesList;
 #include <controller.h>
 #include <rect.h>
 #include <runtime.h>
-
-/* 
- *  @brief - updates force's bias based on current velocity and speed.
- *
- *  @tFc - pointer to the force, which shall be upgraded (for example once per game tick.)
- * */
-void vUpdateForce(tForce *tFc) __attribute__((nonnull(1)));
 
 /* 
  *  @brief - applies the force to the provided rect.
@@ -97,7 +92,8 @@ typedef enum {
  *  @tRct               - pointer to the rect entity, which will be affected by physics.
  *  @eBodyType          - physical type of this body. This defines a lot about the behavior of this entity
  *  @uCollidersGroup    - group in which this entity appears. Only entitties within the same group collide.
- *  @tGForce            - main force applied to the entity, when the body type is DYNAMIC.
+ *  @tMForce            - main force applied to the entity, when the body type is DYNAMIC.
+ *  @tGForce            - Gravity force applied to the object. It can be a zero force to prevent gravity at all.
  *  @tAdditionalForces  - additional forces supplied by user.
  *  @uDelay             - delay in milliseconds, which prevents this controller from spamming too much.
  *
@@ -108,7 +104,6 @@ typedef struct {
     ePhysicalBodyType eBodyType;
     eGravityDirection eGravityDir;
     uint32_t uCollidersGroup;
-    tForce tGForce;
     tForcesList tAdditionalForces;
     uint32_t uDelay;
 } tPhysController;
