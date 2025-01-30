@@ -134,6 +134,6 @@ void vMixerSetChannelAmount(tRuntime *tRun, int iAmount);
  *  the queue is full, then the function will halt, until some channel will be freed.
  *  Do not play music here.
  * */
-void vQueueSound(tRuntime *tRun, uint32_t uSoundID);
+void vQueueSound(tRuntime *tRun, uint32_t uSoundID, uint32_t uLoopCount);
 
 #endif

@@ -28,6 +28,7 @@
  *
  * */
 
+#include <audio_fn.h>
 #include <context2d.h>
 #include <controller.h>
 #include <feather.h>
@@ -230,7 +231,7 @@ enum Direction eLastDir = FRONT;
 FEATHER_LAYER(&Game, 5, GameHandleSounds,, {
     if (Player.velocityX || Player.velocityY) {
         tRuntime *tRun = tThisRuntime();
-        vPlaySound(tRun, uStepSoundId, 0, 0);
+        vQueueSound(tRun, uStepSoundId, 0);
     }
 });
 

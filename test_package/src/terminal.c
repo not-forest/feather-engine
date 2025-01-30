@@ -24,7 +24,6 @@
  * */
 
 #include <feather.h>
-#include <font.h>
 #include <stdlib.h>
 
 FEATHER_SCENE(Shell)

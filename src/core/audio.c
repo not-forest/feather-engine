@@ -204,10 +204,12 @@ void vMixerSetChannelAmount(tRuntime *_, int iAmount) {
  *  Do not play music here.
  * */
 void vQueueSound(tRuntime *tRun, uint32_t uSoundID, uint32_t uLoopCount) {
-    for(;;) 
+    for(;;)
         for (uint8_t uCh = 0; uCh < FEATHER_RUNTIME_MIXER_MAX_CHANNELS; ++uCh)
-            if (!Mix_Playing(uCh)) 
+            if (!Mix_Playing(uCh)) {
                 vPlaySound(tRun, uSoundID, uCh, uLoopCount); 
+                return;
+            }
 }
 
 #endif
