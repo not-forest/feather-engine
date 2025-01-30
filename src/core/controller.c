@@ -183,7 +183,7 @@ bool __vIfMouseInRect(int32_t mx, int32_t my, tRect *tRct) {
     if (tRct == NULL)
         return true;
 
-    return (mx >= tRct->tCtx.fX && mx <= tRct->tCtx.fX + tRct->tFr.uWidth && my >= tRct->tCtx.fY && my <= tRct->tCtx.fY + tRct->tFr.uHeight);
+    return (mx >= tRct->tCtx.fX && mx <= tRct->tCtx.fX + tRct->tCtx.fScaleX * tRct->tFr.uWidth && my >= tRct->tCtx.fY && my <= tRct->tCtx.fY + tRct->tCtx.fScaleX * tRct->tFr.uHeight);
 }
 
 /* 
